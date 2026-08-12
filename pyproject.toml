@@ -1,0 +1,24 @@
+[project]
+name = "vnntest"
+version = "0.0.1"
+authors = [
+  { name="Lukas Rohwer", email"24215157@student.uwa.edu.au" },
+  { name="Bella Lu", email="24491136@student.uwa.edu.au" },
+  { name="Kylie Verzosa", email="24268374@student.uwa.edu.au" },
+  { name="Rundong Wu", email="24441894@student.uwa.edu.au" },
+  { name="Randall Heng", email="24271194@student.uwa.edu.au" },
+  { name="Danny Nguyen", email="24256619@student.uwa.edu.au" },
+]
+description = "An automated, mathematically grounded testing suite for VNNLIB 2.0 neural network solvers."
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = "MIT"
+license-files = ["LICEN[CS]E*"]
+
+[project.urls]
+Homepage = "https://github.com/randollz/CITS3200---Team-28"
+Issues = "https://github.com/randollz/CITS3200---Team-28/issues"
