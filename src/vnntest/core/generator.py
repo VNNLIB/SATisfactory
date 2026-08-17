@@ -4,6 +4,13 @@ import onnx
 
 def generate_all_tests():
     """Finds all test files and generates their ONNX and VNNLIB artifacts in the cache."""
+    # Ensure the base cache directory and its .gitignore exist
+    base_cache_dir = Path(".vnntest")
+    base_cache_dir.mkdir(parents=True, exist_ok=True)
+    gitignore_path = base_cache_dir / ".gitignore"
+    if not gitignore_path.exists():
+        gitignore_path.write_text("*\n")
+
     # Find all .py files inside core/tests/
     tests_dir = Path(__file__).parent / "tests"
     
