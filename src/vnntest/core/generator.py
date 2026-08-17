@@ -9,8 +9,10 @@ def generate_all_tests():
     
     for test_file in tests_dir.rglob("*.py"):
         # Dynamically load the python file as a module
+        import sys
         spec = importlib.util.spec_from_file_location(test_file.stem, test_file)
         module = importlib.util.module_from_spec(spec)
+        sys.modules[spec.name] = module
         spec.loader.exec_module(module)
         
         # Check if the file has our required build functions
