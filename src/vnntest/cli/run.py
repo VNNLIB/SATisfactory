@@ -1,4 +1,5 @@
 import typer
+from vnntest.core.generator import generate_all_tests
 
 app = typer.Typer(help="Run solver test suites")
 
@@ -10,7 +11,11 @@ def mvp(
     """
     Run the MVP test suite against a solver.
     """
-    typer.echo(f"Running MVP tests ({tests}) using solver at {exec_path}")
+    typer.echo("Generating test artifacts...")
+    generate_all_tests()
+    
+    typer.echo(f"\nRunning tests using solver at {exec_path}...")
+    # TODO: Pass the generated files in .vnntest/tests to your SolverHarness
 
 @app.command()
 def precision():
