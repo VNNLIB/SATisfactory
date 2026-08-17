@@ -2,7 +2,7 @@
 name = "vnntest"
 version = "0.0.1"
 authors = [
-  { name="Lukas Rohwer", email"24215157@student.uwa.edu.au" },
+  { name="Lukas Rohwer", email="24215157@student.uwa.edu.au" },
   { name="Bella Lu", email="24491136@student.uwa.edu.au" },
   { name="Kylie Verzosa", email="24268374@student.uwa.edu.au" },
   { name="Rundong Wu", email="24441894@student.uwa.edu.au" },
