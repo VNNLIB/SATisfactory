@@ -39,16 +39,3 @@ def build_vnnlib_spec():
     lines.append("(assert (or (< Y[0] 0) (> Y[0] 0)))")
     
     return lines
-
-output_path = Path(".vnntest/tests/relu/relu01.onnx")
-output_path.parent.mkdir(parents=True, exist_ok=True)
-
-# Save the generated model
-onnx.save(build_onnx_model(), str(output_path))
-print(f"Native ONNX model generated successfully at {output_path}!")
-
-output_path = Path(".vnntest/tests/relu/relu01.vnnlib")
-output_path.parent.mkdir(parents=True, exist_ok=True)
-with open(output_path, "w") as f:
-    f.writelines(line + "\n" for line in build_vnnlib_spec())
-print(f"VNN-LIB specification generated successfully at {output_path}!")
