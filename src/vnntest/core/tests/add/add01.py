@@ -1,9 +1,6 @@
 """
 Add node test case: unsat direction.
 
-Built with onnx.helper directly (not onnxscript) as a deliberate learning
-exercise -- see docs/Randall_Sprint2_Task_Plan.md, Task 1.
-
 Network: Y = A + B, elementwise, both inputs float32 in [0,1].
 Reachable output interval: Y in [0,2] (interval arithmetic; addition is
 monotonic over a convex box so every value in [0,2] is actually reachable,
