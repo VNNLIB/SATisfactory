@@ -26,7 +26,7 @@ To set up the project locally for development, follow these steps:
    ```
 
 4. **Verify the installation**:
-   You should now have access to the `vnntest` CLI command. callable as either `vnntest` or `solver-test-suite`:
+   You should now have access to the `vnntest` CLI, callable as either `vnntest` or `solver-test-suite`:
    ```bash
    vnntest --help
    solver-test-suite --help
