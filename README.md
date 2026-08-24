@@ -2,6 +2,8 @@
 
 An automated, mathematically grounded testing suite for VNNLIB 2.0 neural network solvers.
 
+Dependency versions are pinned in 'pyproject.toml' to keep installs reproducible.
+
 ## Local Setup
 
 To set up the project locally for development, follow these steps:
@@ -24,7 +26,8 @@ To set up the project locally for development, follow these steps:
    ```
 
 4. **Verify the installation**:
-   You should now have access to the `vnntest` CLI command.
+   You should now have access to the `vnntest` CLI, callable as either `vnntest` or `solver-test-suite`:
    ```bash
    vnntest --help
+   solver-test-suite --help
    ```
