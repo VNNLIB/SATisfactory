@@ -23,7 +23,7 @@ def build_onnx_model():
 def build_vnnlib_spec():
     lines = []
 
-    lines.append("(vnnlib-version 2.0)")
+    lines.append("(vnnlib-version <2.0>)")
     lines.append("")
 
     lines.append("(declare-network N")
