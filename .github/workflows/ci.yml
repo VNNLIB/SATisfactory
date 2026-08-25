@@ -25,11 +25,9 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          # Install the package and any testing tools (e.g., pytest)
-          pip install . pytest
+          # Install the package and testing tools
+          pip install . pytest vnnlib
 
       - name: Run tests
         run: |
-          # Replace 'pytest src/' with your actual test command if you use something else.
-          # E.g., python -m unittest discover src/
-          pytest src/
+          pytest tests/
