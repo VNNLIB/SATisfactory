@@ -36,6 +36,6 @@ def build_vnnlib_spec():
 
     # output constraints
     lines.append("; Output Constraints")
-    lines.append("(assert (or (<= Y[0] -1) (>= Y[0] 1)))")
+    lines.append("(assert (or (<= Y[0] 0.0) (>= Y[0] 1.0)))")
     
     return lines
