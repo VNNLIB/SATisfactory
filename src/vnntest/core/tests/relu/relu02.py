@@ -31,7 +31,7 @@ def build_vnnlib_spec():
 
     # Input constraints
     lines.append("; Input Constraints")
-    lines.append("(assert (and (<= X[0] 1000)(>= X[0] 1)))")
+    lines.append("(assert (and (<= X[0] 1000) (>= X[0] 1)))")
     lines.append("")
 
     # output constraints
