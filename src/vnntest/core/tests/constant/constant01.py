@@ -8,11 +8,12 @@ import numpy as np
 def build_onnx_model():
     # Define your custom graph layer using Python syntax
     @script()
-    def relu_layer(x: FLOAT[1]) -> FLOAT[1]:
-        return op.Constant(value=onnx.numpy_helper.from_array(np.zeros((1,), dtype=np.float32)))
+    def constant_layer(x: FLOAT[1]) -> FLOAT[1]:
+        c = op.Constant(value=onnx.numpy_helper.from_array(np.zeros((1,), dtype=np.float32)))
+        return op.Add(x, c)
 
     # Convert the script function into an ONNX model object
-    onnx_model = relu_layer.to_model_proto()
+    onnx_model = constant_layer.to_model_proto()
     return onnx_model
 
 def build_vnnlib_spec():
@@ -27,11 +28,14 @@ def build_vnnlib_spec():
     )
 
     ; Input Constraints
-    (assert (>= X[0] 1))
+    (assert (and (>= X[0] 1.0) (<= X[0] 1000.0)))
 
     ; Output Constraints
-    (assert (<= Y[0] 0))
+    (assert (<= Y[0] 1.0))
     """
 
 def return_expected_output():
-    return "SAT"
+    return "sat"
+
+def unexpected_result_message():
+    return "Expected SAT: Model computes Y = X + 0. With input X >= 1.0, finding Y <= 1.0 is satisfiable (at X=1.0). The solver failed to find this solution."
