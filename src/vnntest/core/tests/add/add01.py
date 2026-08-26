@@ -7,14 +7,8 @@ from onnxscript.onnx_opset import opset18 as op
 
 
 def build_onnx_model():
-    # Second operand baked in as a constant rather than a second declared
-    # input -- keeps the network single-input, far more broadly supported
-    # across solvers than a two-input network.
-    #
-    # Uses the tensor-valued `value` attribute explicitly rather than
-    # onnxscript's default `value_float` scalar form: vibecheck silently
-    # ignores Constant nodes built with `value_float`, so the plain
-    # `x + 0.5` shorthand produces a wrong verdict there.
+    # Constant uses tensor-valued `value`, not `value_float` -- vibecheck
+    # silently mishandles the scalar form.
     @script()
     def add_bias(x: FLOAT[1]) -> FLOAT[1]:
         c = op.Constant(value=onnx_helper.make_tensor("c", TensorProto.FLOAT, [1], [0.5]))
@@ -24,23 +18,23 @@ def build_onnx_model():
 
 
 def build_vnnlib_spec():
-    lines = []
+    # X is 0 to 1. Y = X + 0.5, so Y is 0.5 to 1.5. Y >= 2.0 is
+    # unreachable -> UNSAT.
+    return """(vnnlib-version <2.0>)
 
-    lines.append("(vnnlib-version <2.0>)")
-    lines.append("")
+(declare-network N
+    (declare-input X float32 [1])
+    (declare-output Y float32 [1])
+)
 
-    lines.append("(declare-network N")
-    lines.append("    (declare-input X float32 [1])")
-    lines.append("    (declare-output Y float32 [1])")
-    lines.append(")")
-    lines.append("")
+; Input Constraints
+(assert (>= X[0] 0.0))
+(assert (<= X[0] 1.0))
 
-    # Y = X + 0.5, X in [0,1] -> Y reachable in [0.5, 1.5]
-    lines.append("(assert (>= X[0] 0.0))")
-    lines.append("(assert (<= X[0] 1.0))")
-    lines.append("")
+; Output Constraints
+(assert (>= Y[0] 2.0))
+(assert (<= Y[0] 100.0))"""
 
-    # Max reachable Y is 1.5, so Y >= 2.0 is unreachable -> expect UNSAT
-    lines.append("(assert (>= Y[0] 2.0))")
 
-    return lines
+def return_expected_output():
+    return "UNSAT"
