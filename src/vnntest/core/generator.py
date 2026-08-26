@@ -37,6 +37,9 @@ def generate_all_tests():
             # Generate and Save VNNLIB
             vnnlib_lines = module.build_vnnlib_spec()
             with open(cache_dir / f"{test_file.stem}.vnnlib", "w") as f:
-                f.writelines(line + "\n" for line in vnnlib_lines)
+                if isinstance(vnnlib_lines, str):
+                    f.write(vnnlib_lines)
+                else:
+                    f.writelines(line + "\n" for line in vnnlib_lines)
                 
             print(f"Generated {test_file.stem} artifacts in {cache_dir}")
