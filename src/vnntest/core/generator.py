@@ -40,27 +40,11 @@ def generate_all_tests():
             # Generate and Save VNNLIB
             vnnlib_lines = module.build_vnnlib_spec()
             with open(cache_dir / f"{test_file.stem}.vnnlib", "w") as f:
-                f.writelines(line + "\n" for line in vnnlib_lines)
-
-            # Pick up the expected verdict, if the test module declares one
-            expected = getattr(module, "EXPECTED_RESULT", "unknown")
-            if expected == "unknown":
-                print(f"WARNING: {test_file.stem} has no EXPECTED_RESULT; defaulting to 'unknown'")
-
-            # category is the subfolder path (e.g. "add", or "add/nested" if you
-            # ever go deeper than one level). Paths in the manifest are stored
-            # relative to that category's own cache_dir, not flattened, so
-            # nested categories still resolve correctly downstream.
-            category = subfolder.as_posix() if str(subfolder) != "." else "uncategorized"
-
-            manifest_entries.append({
-                "name": test_file.stem,
-                "category": category,
-                "onnx": f"{test_file.stem}.onnx",
-                "vnnlib": f"{test_file.stem}.vnnlib",
-                "expected": expected,
-            })
-    
+                if isinstance(vnnlib_lines, str):
+                    f.write(vnnlib_lines)
+                else:
+                    f.writelines(line + "\n" for line in vnnlib_lines)
+                
             print(f"Generated {test_file.stem} artifacts in {cache_dir}")
         manifest_path = base_cache_dir / "manifest.json"
         manifest_path.write_text(json.dumps(manifest_entries, indent=2))
