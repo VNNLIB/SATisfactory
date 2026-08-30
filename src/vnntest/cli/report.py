@@ -4,6 +4,11 @@ import typer
 
 app = typer.Typer(help="Generate and view test reports")
 
+@app.callback()
+def report_callback():
+    """Generate and view test reports."""
+    pass
+
 @app.command()
 def view(
     format: str = typer.Option("text", help="Report output format (text, json)"),
