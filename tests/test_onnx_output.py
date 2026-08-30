@@ -10,7 +10,7 @@ def test_onnx_structure():
     """
     # Run vnntest command to generate the MVP artifacts.
     subprocess.run(
-        [sys.executable, "-m", "vnntest", "run", "mvp", "--exec", "e.exe"],
+        [sys.executable, "-m", "vnntest", "run", "mvp", "--solver", "vibecheck"],
         capture_output=True,
         text=True
     )

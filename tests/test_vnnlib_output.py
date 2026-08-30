@@ -13,7 +13,7 @@ def test_vnnlib_structure():
     # Note: e.exe might not exist, so this command might return a non-zero exit code 
     # when it tries to run the solver, but the artifacts should still be generated first.
     subprocess.run(
-        [sys.executable, "-m", "vnntest", "run", "mvp", "--exec", "e.exe"],
+        [sys.executable, "-m", "vnntest", "run", "mvp", "--solver", "vibecheck"],
         capture_output=True,
         text=True
     )
