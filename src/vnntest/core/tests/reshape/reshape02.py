@@ -43,3 +43,7 @@ def build_vnnlib_spec():
 
 def return_expected_output():
     return "SAT"
+
+
+def unexpected_result_message():
+    return "Expected SAT: Model reshapes X into a 2x2 matrix, Y[0,0]=X[0] unchanged. With X[0] in [0.0, 1.0], finding Y[0,0] >= 0.7 is satisfiable (at X[0]=1.0, Y[0,0]=1.0). The solver failed to find this solution."
