@@ -10,25 +10,6 @@ from onnxscript import FLOAT, script
 from onnxscript.onnx_opset import opset18 as op
 
 
-def _bake_constants_as_initializers(model):
-    # vibecheck's BatchNormalization support (frontend/onnx_loader.py) only
-    # reads scale/bias/mean/var from real ONNX initializers, not from
-    # separate Constant nodes -- without this, it fails with KeyError and
-    # silently falls back to an unrelated handler that gives wrong verdicts.
-    graph = model.graph
-    remaining_nodes = []
-    for node in graph.node:
-        if node.op_type == "Constant":
-            tensor = next(a.t for a in node.attribute if a.name == "value")
-            tensor.name = node.output[0]
-            graph.initializer.append(tensor)
-        else:
-            remaining_nodes.append(node)
-    del graph.node[:]
-    graph.node.extend(remaining_nodes)
-    return model
-
-
 def build_onnx_model():
     @script()
     def batchnorm_x(x: FLOAT[1, 2]) -> FLOAT[1, 2]:
@@ -38,7 +19,7 @@ def build_onnx_model():
         var = op.Constant(value=onnx_helper.make_tensor("var", TensorProto.FLOAT, [2], [1.0, 1.0]))
         return op.BatchNormalization(x, scale, b, mean, var, epsilon=0.0)
 
-    return _bake_constants_as_initializers(batchnorm_x.to_model_proto())
+    return batchnorm_x.to_model_proto()
 
 
 def build_vnnlib_spec():
