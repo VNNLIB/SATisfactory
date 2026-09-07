@@ -39,4 +39,4 @@ def return_expected_output():
     return "sat"
 
 def unexpected_result_message():
-    return "Expected SAT: Model computes Y = X * 0. With input X >= 0 and <= 1000.0, Y = 0. Finding Y <= 0 is satisfiable (at X = 0). The solver failed to find this solution."
+    return "Expected SAT: Model computes Y = X1 * X2. With input X1 <= 0.0 and X2 >= 0.0, Y <= 0.0. Finding Y <= 0 is satisfiable. The solver failed to find this solution."
