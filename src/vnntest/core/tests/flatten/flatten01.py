@@ -17,7 +17,7 @@ def build_vnnlib_spec():
 
     (declare-network N
         (declare-input X Float32 [1, 2, 2])
-        (decalre-output Y Float32 [1, 4])
+        (declare-output Y Float32 [1, 4])
     )
 
     ; Input Constraints
