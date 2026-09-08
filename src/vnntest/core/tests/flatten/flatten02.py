@@ -1,7 +1,7 @@
 """Flatten node test case: sat direction. Paired with flatten01.py so
 the suite covers both polarities for this node type."""
 
-from oonxscript import FLOAT, script
+from onnxscript import FLOAT, script
 from onnxscript.onnx_opset import opset18 as op
 
 def build_onnx_model():
