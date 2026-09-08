@@ -47,3 +47,7 @@ def build_vnnlib_spec():
 
 def return_expected_output():
     return "SAT"
+
+
+def unexpected_result_message():
+    return "Expected SAT: Model reshapes X into a 2x2 matrix; under correct row-major flattening Y[1,0]=X[2]. With X[2] in [10.0, 11.0], finding Y[1,0] >= 10.0 is satisfiable (at X[2]=10.0). The solver failed to find this solution -- likely because it flattened column-major instead, picking up X[1] (which maxes at 1.0)."
