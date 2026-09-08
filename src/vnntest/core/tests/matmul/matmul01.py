@@ -38,3 +38,7 @@ def build_vnnlib_spec():
 
 def return_expected_output():
     return "UNSAT"
+
+
+def unexpected_result_message():
+    return "Expected UNSAT: Model computes Y[0,0] = 0.5*X[0,0] + 0.5*X[0,1]. With both inputs in [0.0, 1.0], Y[0,0] is at most 1.0, making the output condition Y[0,0] >= 2.0 impossible. The solver incorrectly claimed it is satisfiable."
