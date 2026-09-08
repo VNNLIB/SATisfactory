@@ -18,22 +18,22 @@ def build_vnnlib_spec():
 
     ; neural network declaration
     (declare-network N
-        (declare-input X1 real [2 1])
-        (declare-input X2 real [1 2])
-        (declare-output Y real [2 2])
+        (declare-input X1 real [2,1])
+        (declare-input X2 real [1,2])
+        (declare-output Y real [2,2])
     )
     
     ; Input Constraints
-    (assert (and (>= X1[0 0] 1.0) (<= X1[0 0] 2.0)))
-    (assert (and (>= X1[1 0] 1.0) (<= X1[1 0] 2.0)))
-    (assert (and (>= X2[0 0] 1.0) (<= X2[0 0] 2.0)))
-    (assert (and (>= X2[0 1] 1.0) (<= X2[0 1] 2.0)))
+    (assert (and (>= X1[0,0] 1.0) (<= X1[0,0] 2.0)))
+    (assert (and (>= X1[1,0] 1.0) (<= X1[1,0] 2.0)))
+    (assert (and (>= X2[0,0] 1.0) (<= X2[0,0] 2.0)))
+    (assert (and (>= X2[0,1] 1.0) (<= X2[0,1] 2.0)))
 
     ; Output Constraints
-    (assert (or (>= Y[0 0] 5.0) (<= Y[0 0] 0.0)
-                (>= Y[0 1] 5.0) (<= Y[0 1] 0.0)
-                (>= Y[1 0] 5.0) (<= Y[1 0] 0.0)
-                (>= Y[1 1] 5.0) (<= Y[1 1] 0.0)))
+    (assert (or (>= Y[0,0] 5.0) (<= Y[0,0] 0.0)
+                (>= Y[0,1] 5.0) (<= Y[0,1] 0.0)
+                (>= Y[1,0] 5.0) (<= Y[1,0] 0.0)
+                (>= Y[1,1] 5.0) (<= Y[1,1] 0.0)))
     """
 
 def return_expected_output():
