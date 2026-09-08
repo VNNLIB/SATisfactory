@@ -50,3 +50,7 @@ def build_vnnlib_spec():
 
 def return_expected_output():
     return "UNSAT"
+
+
+def unexpected_result_message():
+    return "Expected UNSAT: Model reshapes X into a 2x2 matrix; under correct row-major flattening Y[0,1]=X[1]. With X[1] in [0.0, 1.0], Y[0,1] is at most 1.0, making the output condition Y[0,1] >= 10.0 impossible. The solver incorrectly claimed it is satisfiable -- likely because it flattened column-major instead, picking up X[2] (which is 10.0 to 11.0)."

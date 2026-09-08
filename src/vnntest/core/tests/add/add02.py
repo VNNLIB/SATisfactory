@@ -37,3 +37,7 @@ def build_vnnlib_spec():
 
 def return_expected_output():
     return "SAT"
+
+
+def unexpected_result_message():
+    return "Expected SAT: Model computes Y = X + 0.5. With X in [0.0, 1.0], finding Y[0] >= 1.2 is satisfiable (at X=1.0, Y=1.5). The solver failed to find this solution."
