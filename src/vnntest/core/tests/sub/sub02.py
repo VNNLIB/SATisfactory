@@ -17,23 +17,27 @@ def build_onnx_model():
 
 
 def build_vnnlib_spec():
-    lines = []
+    # X is 0 to 1. Y = X - 0.5, so Y is -0.5 to 0.5. Y >= 0.2 is
+    # reachable (witness X=1.0 -> Y=0.5) -> SAT.
+    return """(vnnlib-version <2.0>)
 
-    lines.append("(vnnlib-version <2.0>)")
-    lines.append("")
+(declare-network N
+    (declare-input X float32 [1])
+    (declare-output Y float32 [1])
+)
 
-    lines.append("(declare-network N")
-    lines.append("    (declare-input X float32 [1])")
-    lines.append("    (declare-output Y float32 [1])")
-    lines.append(")")
-    lines.append("")
+; Input Constraints
+(assert (>= X[0] 0.0))
+(assert (<= X[0] 1.0))
 
-    # Y = X - 0.5, X in [0,1] -> Y reachable in [-0.5, 0.5]
-    lines.append("(assert (>= X[0] 0.0))")
-    lines.append("(assert (<= X[0] 1.0))")
-    lines.append("")
+; Output Constraints
+(assert (>= Y[0] 0.2))
+(assert (<= Y[0] 100.0))"""
 
-    # Witness X=1.0 -> Y=0.5, satisfies Y >= 0.2 -> expect SAT
-    lines.append("(assert (>= Y[0] 0.2))")
 
-    return lines
+def return_expected_output():
+    return "SAT"
+
+
+def unexpected_result_message():
+    return "Expected SAT: Model computes Y = X - 0.5. With X in [0.0, 1.0], finding Y[0] >= 0.2 is satisfiable (at X=1.0, Y=0.5). The solver failed to find this solution."

@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import Enum
 
-from vnntest.core.harness import SolverRunResult
+from vnntest.core.runner import SolverRunResult
 from vnntest.models.test_case import Verdict
 
 
