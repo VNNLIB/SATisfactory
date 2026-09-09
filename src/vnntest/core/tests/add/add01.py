@@ -5,7 +5,6 @@ from onnx import helper as onnx_helper
 from onnxscript import FLOAT, script
 from onnxscript.onnx_opset import opset18 as op
 
-EXPECTED_RESULT = "unsat"
 
 def build_onnx_model():
     @script()
