@@ -30,6 +30,30 @@ def parse_verdict(stdout: str) -> Verdict:
     return Verdict.from_str(match.group(1))
 
 
+def get_supported_ops(exec_path: str) -> Optional[set[str]]:
+    """
+    Returns the set of ONNX op types the solver claims to support, via its
+    `supports --onnx-operators` command (VNN-LIB 2.0 Chapter 5).
+
+    Returns None if the check itself is unavailable (the solver doesn't
+    implement `supports`, times out, etc.) -- callers should treat that as
+    "unknown", not as "supports nothing".
+    """
+    try:
+        result = subprocess.run(
+            [exec_path, "supports", "--onnx-operators"],
+            capture_output=True, text=True, timeout=30,
+        )
+    except (subprocess.TimeoutExpired, FileNotFoundError):
+        return None
+
+    if result.returncode != 0:
+        return None
+
+    ops = {line.strip() for line in result.stdout.splitlines() if line.strip()}
+    return ops or None
+
+
 def run_solver_on_test(exec_path: str, test_case: TestCase, timeout: int = 300) -> SolverRunResult:
     """
     Executes a VNNLIB 2.0 compatible solver on a single test case.

@@ -46,12 +46,28 @@ def generate_all_tests():
         print(f"Generated {test_file.stem} artifacts in {cache_dir}")
 
         expected = getattr(module, "return_expected_output", lambda: "UNKNOWN")()
+        unexpected_message = getattr(module, "unexpected_result_message", lambda: None)()
+        op_types = sorted({node.op_type for node in onnx_model.graph.node})
+        description = " ".join((module.__doc__ or "").split())
+
+        # The op type this test is actually about, e.g. "matmul" -> "MatMul".
+        # Other ops in the network (most commonly Constant, used to carry
+        # fixed values) are construction details, not what's under test --
+        # a solver that folds Constant away without declaring it "supported"
+        # shouldn't cause every test that happens to use one to be skipped.
+        category_name = subfolder.name.lower()
+        primary_op_type = next((op for op in op_types if op.lower() == category_name), None)
+
         manifest_entries.append({
             "name": test_file.stem,
             "category": str(subfolder),
             "onnx": f"{test_file.stem}.onnx",
             "vnnlib": f"{test_file.stem}.vnnlib",
             "expected": expected,
+            "op_types": op_types,
+            "primary_op_type": primary_op_type,
+            "description": description,
+            "unexpected_message": unexpected_message,
         })
 
     manifest_path = base_cache_dir / "manifest.json"
