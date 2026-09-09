@@ -1,6 +1,8 @@
 import json
 from collections import defaultdict
+from enum import Enum
 from pathlib import Path
+from typing import List
 
 import typer
 
@@ -25,6 +27,22 @@ _CATEGORY_ORDER = ["arithmetic", "activation", "structural", "other"]
 _SYMBOL = {"pass": "✅", "fail": "❌", "suspect": "🚩", "error": "⚠️", "skip": "⏭️"}
 _DETAIL_OUTCOMES = {"fail", "suspect", "error"}
 
+
+class Category(str, Enum):
+    ARITHMETIC = "arithmetic"
+    ACTIVATION = "activation"
+    STRUCTURAL = "structural"
+    OTHER = "other"
+
+
+class OutcomeFilter(str, Enum):
+    PASS = "pass"
+    FAIL = "fail"
+    SUSPECT = "suspect"
+    ERROR = "error"
+    SKIP = "skip"
+
+
 @app.callback()
 def report_callback():
     """Generate and view test reports."""
@@ -34,9 +52,15 @@ def report_callback():
 def view(
     format: str = typer.Option("text", help="Report output format (text, json)"),
     report_path: str = typer.Option(".vnntest/report.json", help="Path to the report file"),
+    category: List[Category] = typer.Option(
+        [], "--category", help="Only show these categories (repeatable), e.g. --category arithmetic"
+    ),
+    outcome: List[OutcomeFilter] = typer.Option(
+        [], "--outcome", help="Only show these outcomes (repeatable), e.g. --outcome fail --outcome suspect"
+    ),
 ):
     """
-    View a generated test report.
+    View a generated test report. With no filters, shows everything.
     """
     path = Path(report_path)
     if not path.exists():
@@ -44,28 +68,57 @@ def view(
         raise typer.Exit(code=1)
 
     report = json.loads(path.read_text())
+    categories = {c.value for c in category}
+    outcomes = {o.value for o in outcome}
+    filtered = _apply_filters(report, categories, outcomes)
 
     if format == "json":
-        typer.echo(json.dumps(report, indent=2))
-        return
-    if format != "text":
-        typer.echo(f"Unknown format '{format}', falling back to text.")
+        typer.echo(json.dumps(filtered, indent=2))
+    else:
+        if format != "text":
+            typer.echo(f"Unknown format '{format}', falling back to text.")
+        _print_text_report(filtered, categories, outcomes)
 
-    _print_text_report(report)
-
+    # Exit status reflects the full, unfiltered run -- a display filter
+    # should never mask a real failure from CI.
     summary = report["summary"]
     if summary["failed"] > 0 or summary["suspect"] > 0 or summary["errored"] > 0:
         raise typer.Exit(code=1)
 
 
-def _print_text_report(report: dict) -> None:
+def _apply_filters(report: dict, categories: set, outcomes: set) -> dict:
+    results = report["results"]
+    skipped = report.get("skipped", [])
+
+    if categories:
+        results = [r for r in results if _CATEGORY_OF.get(r["category"], "other") in categories]
+        skipped = [s for s in skipped if _CATEGORY_OF.get(s["category"], "other") in categories]
+    if outcomes:
+        results = [r for r in results if r["outcome"] in outcomes]
+        if "skip" not in outcomes:
+            skipped = []
+
+    return {**report, "results": results, "skipped": skipped}
+
+
+def _print_text_report(report: dict, categories: set, outcomes: set) -> None:
+    if categories or outcomes:
+        parts = []
+        if categories:
+            parts.append(f"category in {{{', '.join(sorted(categories))}}}")
+        if outcomes:
+            parts.append(f"outcome in {{{', '.join(sorted(outcomes))}}}")
+        typer.echo(f"Filters: {' and '.join(parts)}")
+
     grouped = defaultdict(list)
     for r in report["results"]:
         grouped[_CATEGORY_OF.get(r["category"], "other")].append(r)
 
+    shown = 0
     for cat in _CATEGORY_ORDER:
         if cat not in grouped:
             continue
+        shown += len(grouped[cat])
         typer.echo(f"\n{cat.capitalize()}")
         typer.echo("-" * len(cat))
         for r in grouped[cat]:
@@ -75,12 +128,25 @@ def _print_text_report(report: dict) -> None:
                 _print_failure_detail(r)
 
     _print_skipped_section(report.get("skipped", []))
+    shown += len(report.get("skipped", []))
 
-    summary = report["summary"]
+    if shown == 0:
+        typer.echo("No tests match the given filters.")
+        return
+
+    _print_filtered_summary(report["results"], report.get("skipped", []))
+
+
+def _print_filtered_summary(results: list, skipped: list) -> None:
+    counts = {o.value: 0 for o in OutcomeFilter}
+    for r in results:
+        counts[r["outcome"]] = counts.get(r["outcome"], 0) + 1
+    counts["skip"] += len(skipped)
+
     typer.echo(
-        f"\nTotal: {summary['total']}  Passed: {summary['passed']}  "
-        f"Failed: {summary['failed']}  Suspect: {summary['suspect']}  "
-        f"Errored: {summary['errored']}  Skipped: {summary['skipped']}"
+        f"\nShown: {len(results) + len(skipped)}  Passed: {counts['pass']}  "
+        f"Failed: {counts['fail']}  Suspect: {counts['suspect']}  "
+        f"Errored: {counts['error']}  Skipped: {counts['skip']}"
     )
 
 
