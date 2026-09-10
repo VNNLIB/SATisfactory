@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
+from typing import Optional
 
 
 class Verdict(str, Enum):
@@ -26,6 +27,10 @@ class TestCase:
     onnx_path: Path
     vnnlib_path: Path
     expected: Verdict
+    op_types: list[str] = field(default_factory=list)  # ONNX op types in the model, e.g. ["Add"]
+    primary_op_type: Optional[str] = None  # the op this test is actually about, e.g. "Add"
+    description: str = ""
+    unexpected_message: Optional[str] = None
 
     @property
     def id(self) -> str:
@@ -39,4 +44,8 @@ class TestCase:
             onnx_path=cache_dir / entry["onnx"],
             vnnlib_path=cache_dir / entry["vnnlib"],
             expected=Verdict.from_str(entry["expected"]),
+            op_types=entry.get("op_types", []),
+            primary_op_type=entry.get("primary_op_type"),
+            description=entry.get("description", ""),
+            unexpected_message=entry.get("unexpected_message"),
         )
