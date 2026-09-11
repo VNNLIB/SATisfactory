@@ -41,3 +41,6 @@ def build_vnnlib_spec():
 
 def return_expected_output():
     return "SAT"
+
+def unexpected_result_message():
+    return "Expected SAT: Model reshapes X into Y via Flatten with values unchanged, so Y[0,0] = X[0,0,0]. With X[0,0,0] bounded in [0.0, 1.0], Y[0,0] >= 0.7 is reachable at X[0,0,0] = 1.0. The solver failed to find this solution."
