@@ -25,7 +25,7 @@ def build_vnnlib_spec():
     (assert (>= X[0,0] 0.0))
     (assert (<= X[0,0] 1.0))
     (assert (>= X[0,1] 0.0))
-    (assert (>= X[0,1] 1.0))
+    (assert (<= X[0,1] 1.0))
 
     ; Output Constraints
     (assert (>= Y[0,0] 0.7))
