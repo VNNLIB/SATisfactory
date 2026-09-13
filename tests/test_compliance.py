@@ -13,6 +13,7 @@ from vnntest.core.compliance import (
     check_serialise_assignments, validate_serialise_assignments,
 )
 from vnntest.core.runner import run_solver_command, run_solver_on_test
+from vnntest.models.test_case import TestCase, Verdict
 
 
 @pytest.mark.parametrize('output', ['13\n19', '13\n19\n', '13\r\n19\r\n', '19\n19\n'])
@@ -75,10 +76,16 @@ def test_shared_runner_preserves_process_output():
 
 
 def test_verify_invocation_and_output_are_unchanged():
+    test_case = TestCase(
+        name='query', category='model', onnx_path=Path('model.onnx'),
+        vnnlib_path=Path('query.vnnlib'), expected=Verdict.UNSAT,
+    )
     result = subprocess.CompletedProcess([], 0, 'unsat\n', 'log\n')
     with patch('vnntest.core.runner.subprocess.run', return_value=result) as run:
-        output = run_solver_on_test('solver', Path('model.onnx'), Path('query.vnnlib'), 3)
-    assert output == 'unsat\n\nlog\n'
+        run_result = run_solver_on_test('solver', test_case, 3)
+    assert run_result.verdict == Verdict.UNSAT
+    assert run_result.stdout == 'unsat\n'
+    assert run_result.stderr == 'log\n'
     run.assert_called_once_with(
         ['solver', 'verify', 'query.vnnlib', '--network', 'N=model.onnx', '--timeout', '3'],
         capture_output=True, text=True, timeout=3,

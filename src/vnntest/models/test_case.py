@@ -22,6 +22,8 @@ class Verdict(str, Enum):
 
 @dataclass
 class TestCase:
+    __test__ = False  # not a pytest test class, just named similarly
+
     name: str            # e.g. "add01"
     category: str        # e.g. "add" (subfolder under core/tests)
     onnx_path: Path
