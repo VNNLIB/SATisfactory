@@ -19,11 +19,17 @@ def generate_all_tests():
     tests_dir = Path(__file__).parent / "tests"
 
     for test_file in tests_dir.rglob("*.py"):
+        # Each test file is loaded as its own module so we can call the
+        # build_* functions it defines. Registering it in sys.modules
+        # mirrors normal import behavior and avoids re-import edge cases.
         spec = importlib.util.spec_from_file_location(test_file.stem, test_file)
         module = importlib.util.module_from_spec(spec)
         sys.modules[spec.name] = module
         spec.loader.exec_module(module)
 
+        # Not every .py file under tests/ is a test case (e.g. shared
+        # helpers) -- only files implementing both build functions count.
+        
         if not (hasattr(module, "build_onnx_model") and hasattr(module, "build_vnnlib_spec")):
             continue
 

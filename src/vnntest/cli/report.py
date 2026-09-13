@@ -102,6 +102,8 @@ def _apply_filters(report: dict, categories: set, outcomes: set) -> dict:
 
 
 def _print_text_report(report: dict, categories: set, outcomes: set) -> None:
+    """Human-readable rendering: tests grouped by category, in a fixed
+    display order, with per-test detail lines for non-pass outcomes."""
     if categories or outcomes:
         parts = []
         if categories:
@@ -138,6 +140,9 @@ def _print_text_report(report: dict, categories: set, outcomes: set) -> None:
 
 
 def _print_filtered_summary(results: list, skipped: list) -> None:
+    """Tallies just the currently-displayed (post-filter) results, distinct
+    from the run's overall summary shown by run.py."""
+
     counts = {o.value: 0 for o in OutcomeFilter}
     for r in results:
         counts[r["outcome"]] = counts.get(r["outcome"], 0) + 1
@@ -151,6 +156,10 @@ def _print_filtered_summary(results: list, skipped: list) -> None:
 
 
 def _print_failure_detail(r: dict) -> None:
+    """Detailed context printed under any fail/suspect/error line: the test's
+    description, any custom failure message, the raw error, and (if the
+    VNNLIB file still exists on disk) the actual query that was run."""
+
     if r.get("description"):
         typer.echo(f"    {r['description']}")
     if r.get("unexpected_message") and r["outcome"] in ("fail", "suspect"):
@@ -166,6 +175,9 @@ def _print_failure_detail(r: dict) -> None:
 
 
 def _print_skipped_section(skipped: list) -> None:
+    """Skipped tests get their own trailing section rather than being mixed
+    into the category groups above, since they were never actually run."""
+    
     if not skipped:
         return
     typer.echo(f"\nNot tested -- solver does not claim support ({len(skipped)})")

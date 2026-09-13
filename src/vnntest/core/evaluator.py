@@ -18,6 +18,11 @@ class Outcome(str, Enum):
 
 @dataclass
 class EvaluationResult:
+
+    """Pairs a solver's raw run with the Outcome it was judged to produce.
+    Convenience properties expose the fields report_builder.py needs
+    without it having to reach into run_result.test_case directly."""
+
     run_result: SolverRunResult
     outcome: Outcome
 
@@ -36,6 +41,11 @@ class EvaluationResult:
 
 @dataclass
 class SkippedResult:
+
+    """A test case that was never run because the solver doesn't claim to
+    support its op type. Kept separate from EvaluationResult since there's
+    no run_result to attach -- the solver was never invoked at all."""
+
     test_case: TestCase
     missing_op: str
 
@@ -45,6 +55,14 @@ class SkippedResult:
 
 
 def evaluate(run_result: SolverRunResult) -> EvaluationResult:
+
+    """Classifies a single solver run into an Outcome.
+
+    Order matters here: system-level failures (crash/timeout) are checked
+    first regardless of what the solver actually returned, since a
+    timed-out process's output shouldn't be trusted as a real verdict.
+    """
+
     if run_result.error or run_result.timed_out:
         return EvaluationResult(run_result, Outcome.ERROR)
 
