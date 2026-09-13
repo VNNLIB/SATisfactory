@@ -2,6 +2,7 @@
 Run the code by using:
 
     vnntest run mvp --solver vibecheck
+    vnntest run mvp --solver vibecheck --node-type matmul
 """
 
 import json
@@ -17,23 +18,20 @@ from vnntest.core.evaluator import (
     summarize,
 )
 from vnntest.core.generator import generate_all_tests
+from vnntest.core.registry import get_node_types
 from vnntest.core.runner import get_supported_ops, run_solver_on_test
 from vnntest.models.test_case import TestCase
 
-#Initialise typer CLI app instance to help with documentation
 app = typer.Typer(help="Run solver test suites, one test at a time, with detailed output")
 
 _SYMBOL = {"pass": "✅", "fail": "❌", "suspect": "🚩", "error": "⚠️", "skip": "⏭️"}
 
 
 def _build_detail_message(result: EvaluationResult) -> str:
-
-    #Code for explaining non-passable results for solver
     tc = result.run_result.test_case
     description = tc.description or "(no description provided)"
 
-    #ERROR: Solver crashed/timed out OR missing known benchmark verdict.
-    # Handles system-level errors, timeouts, or unmapped expected values 
+    # ERROR: solver crashed/timed out, or there's no known verdict to compare against.
     if result.outcome == Outcome.ERROR:
         if result.run_result.timed_out:
             return f"{description} -> solver timed out."
@@ -41,8 +39,7 @@ def _build_detail_message(result: EvaluationResult) -> str:
             return f"{description} -> solver error: {result.run_result.error}"
         return f"{description} -> no known expected verdict for this test; nothing to compare against."
 
-    #SUSPECT:Solver didn't crash but returned 'unknown' on supported ops.
-    #Handle inconclusive results on supported operations 
+    # SUSPECT: solver claims support, ran cleanly, still returned "unknown".
     if result.outcome == Outcome.SUSPECT:
         return (
             f"{description} -> solver claims to support this op and ran "
@@ -50,8 +47,7 @@ def _build_detail_message(result: EvaluationResult) -> str:
             f"of a definite verdict (expected '{result.expected.value}')."
         )
 
-    #FAIL: FAIL: Disagreement between expected verdict and actual solver response.
-    #Handle explicit answer mismatches, prioritizing custom failure messages if present
+    # FAIL: solver gave a definite, wrong verdict.
     if result.outcome == Outcome.FAIL:
         if tc.unexpected_message:
             return (
@@ -66,27 +62,31 @@ def _build_detail_message(result: EvaluationResult) -> str:
     return ""  # PASS never reaches this -- callers only invoke it on non-pass
 
 
-@app.command()
-def mvp(
-    solver: str = typer.Option(..., "--solver", help="Command or path to invoke the solver's CLI (e.g. 'vibecheck' or './run_solver.sh')"),
-    tests: str = typer.Option("basic_layers", help="Test suite to run"),
-    timeout: float = typer.Option(300.0, help="Per-test timeout in seconds"),
-):
-    """
-    Run the MVP test suite against a solver, one test at a time.
-    """
-    typer.echo("Generating test artifacts...")
-    generate_all_tests() #Ensures local .vnntest/ directory and manifests exist
+def _validate_node_type(node_type: str | None) -> None:
+    if node_type is None:
+        return
+    known = get_node_types()
+    if node_type not in known:
+        typer.echo(f"Unknown node type {node_type!r}. Known: {', '.join(known)}")
+        raise typer.Exit(code=1)
 
-    #Execcution loop setup
+
+def _run_suite(suite: str, solver: str, node_type: str | None, timeout: float) -> None:
+    _validate_node_type(node_type)
+
+    typer.echo("Generating test artifacts...")
+    manifest = generate_all_tests(suite=suite, node_type=node_type)
+    if not manifest:
+        typer.echo(f"No test cases registered for suite {suite!r}"
+                    + (f" and node type {node_type!r}." if node_type else "."))
+        return
+
     cache_dir = Path(".vnntest")
-    manifest = json.loads((cache_dir / "manifest.json").read_text())
     test_cases = [
         TestCase.from_manifest_entry(e, cache_dir / "tests" / e["category"])
         for e in manifest
     ]
 
-    # Query solver capability to skip unsupported ONNX/VNNLIB operations
     typer.echo(f"\nChecking what {solver} claims to support...")
     supported_ops = get_supported_ops(solver)
     if supported_ops is None:
@@ -97,7 +97,6 @@ def mvp(
 
     typer.echo(f"\nRunning {len(runnable)} test(s) one by one using solver at {solver}...\n")
 
-    #Iterate through tests sequentially and stream status lines immediately
     eval_results: list[EvaluationResult] = []
     for i, tc in enumerate(runnable, start=1):
         run_result = run_solver_on_test(solver, tc, timeout=timeout)
@@ -109,11 +108,9 @@ def mvp(
         if eval_result.outcome != Outcome.PASS:
             typer.echo(f"    {_build_detail_message(eval_result)}")
 
-    # Log skipped tests at bottom of console output
     for s in skipped:
         typer.echo(f"{_SYMBOL['skip']} {s.test_id:<24} (missing: {s.missing_op})")
 
-    #Print total and format JSON report
     summary = summarize(eval_results, skipped)
     typer.echo(
         f"\n{summary['passed']}/{summary['total']} passed, "
@@ -152,6 +149,30 @@ def mvp(
     }
     (cache_dir / "report.json").write_text(json.dumps(report, indent=2))
     typer.echo(f"\nDetailed report written to {cache_dir / 'report.json'}")
+
+
+@app.command()
+def mvp(
+    solver: str = typer.Option(..., "--solver", help="Command or path to invoke the solver's CLI (e.g. 'vibecheck' or './run_solver.sh')"),
+    node_type: str | None = typer.Option(None, "--node-type", help="Run only this node type (e.g. add, relu, matmul)"),
+    timeout: float = typer.Option(300.0, help="Per-test timeout in seconds"),
+):
+    """
+    Run the MVP test suite against a solver, one test at a time.
+    """
+    _run_suite("mvp", solver, node_type, timeout)
+
+
+@app.command()
+def precision(
+    solver: str = typer.Option(..., "--solver", help="Command or path to invoke the solver's CLI"),
+    node_type: str | None = typer.Option(None, "--node-type", help="Run only this node type (e.g. add, relu, matmul)"),
+    timeout: float = typer.Option(300.0, help="Per-test timeout in seconds"),
+):
+    """
+    Run the precision test suite against a solver, one test at a time.
+    """
+    _run_suite("precision", solver, node_type, timeout)
 
 
 if __name__ == "__main__":
