@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import locale
 import re
 import subprocess
 from dataclasses import dataclass
@@ -30,6 +31,26 @@ def parse_verdict(stdout: str) -> Verdict:
     return Verdict.from_str(match.group(1))
 
 
+def run_solver_command(
+    exec_path: str, arguments: list[str], timeout: int = 10, *, preserve_newlines: bool = False,
+) -> subprocess.CompletedProcess[str]:
+    """Run any solver subcommand, preserving stdout, stderr and the exit code.
+
+    Set preserve_newlines for strict CLI format checks (e.g. compliance
+    checks that care about trailing newlines). Errors reach the caller.
+    """
+    result = subprocess.run(
+        [exec_path, *arguments], capture_output=True, text=not preserve_newlines, timeout=timeout
+    )
+    if preserve_newlines:
+        encoding = locale.getpreferredencoding(False)
+        return subprocess.CompletedProcess(
+            result.args, result.returncode,
+            result.stdout.decode(encoding), result.stderr.decode(encoding),
+        )
+    return result
+
+
 def get_supported_ops(exec_path: str) -> Optional[set[str]]:
     """
     Returns the set of ONNX op types the solver claims to support, via its
@@ -40,10 +61,7 @@ def get_supported_ops(exec_path: str) -> Optional[set[str]]:
     "unknown", not as "supports nothing".
     """
     try:
-        result = subprocess.run(
-            [exec_path, "supports", "--onnx-operators"],
-            capture_output=True, text=True, timeout=30,
-        )
+        result = run_solver_command(exec_path, ["supports", "--onnx-operators"], timeout=30)
     except (subprocess.TimeoutExpired, FileNotFoundError):
         return None
 
@@ -65,7 +83,6 @@ def run_solver_on_test(exec_path: str, test_case: TestCase, timeout: int = 300) 
     kept separate for error reporting, not verdict parsing.
     """
     cmd = [
-        exec_path,
         "verify",
         str(test_case.vnnlib_path),
         "--network", f"N={test_case.onnx_path}",
@@ -73,7 +90,7 @@ def run_solver_on_test(exec_path: str, test_case: TestCase, timeout: int = 300) 
     ]
 
     try:
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+        result = run_solver_command(exec_path, cmd, timeout)
     except subprocess.TimeoutExpired as e:
         return SolverRunResult(
             test_case=test_case, verdict=Verdict.UNKNOWN, returncode=-1,
