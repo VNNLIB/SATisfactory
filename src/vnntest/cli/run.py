@@ -3,6 +3,7 @@ Run the code by using:
 
     vnntest run mvp --solver vibecheck
     vnntest run mvp --solver vibecheck --node-type matmul
+    vnntest run mvp --solver vibecheck --verbose
 """
 
 import json
@@ -19,7 +20,7 @@ from vnntest.core.evaluator import (
 )
 from vnntest.core.generator import generate_all_tests
 from vnntest.core.registry import get_node_types
-from vnntest.core.runner import get_supported_ops, run_solver_on_test
+from vnntest.core.runner import SolverRunResult, get_supported_ops, run_solver_on_test
 from vnntest.models.test_case import TestCase
 
 app = typer.Typer(help="Run solver test suites, one test at a time, with detailed output")
@@ -62,6 +63,20 @@ def _build_detail_message(result: EvaluationResult) -> str:
     return ""  # PASS never reaches this -- callers only invoke it on non-pass
 
 
+def _print_raw_output(run_result: SolverRunResult) -> None:
+    """Dumps a test's full solver stdout/stderr, unabridged -- the same
+    everything-it-said-for-every-test behaviour main's cli/run.py has
+    always had, offered here as an opt-in alongside the terse/detailed
+    modes rather than replacing them."""
+    typer.echo("    --- raw solver output ---")
+    for line in run_result.stdout.splitlines():
+        typer.echo(f"    {line}")
+    if run_result.stderr.strip():
+        typer.echo("    --- stderr ---")
+        for line in run_result.stderr.splitlines():
+            typer.echo(f"    {line}")
+
+
 def _validate_node_type(node_type: str | None) -> None:
     if node_type is None:
         return
@@ -71,7 +86,9 @@ def _validate_node_type(node_type: str | None) -> None:
         raise typer.Exit(code=1)
 
 
-def _run_suite(suite: str, solver: str, node_type: str | None, timeout: float) -> None:
+def _run_suite(
+    suite: str, solver: str, node_type: str | None, timeout: float, verbose: bool = False,
+) -> None:
     _validate_node_type(node_type)
 
     typer.echo("Generating test artifacts...")
@@ -107,6 +124,8 @@ def _run_suite(suite: str, solver: str, node_type: str | None, timeout: float) -
         typer.echo(f"Test {i} {symbol} {eval_result.test_id}")
         if eval_result.outcome != Outcome.PASS:
             typer.echo(f"    {_build_detail_message(eval_result)}")
+        if verbose:
+            _print_raw_output(run_result)
 
     for s in skipped:
         typer.echo(f"{_SYMBOL['skip']} {s.test_id:<24} (missing: {s.missing_op})")
@@ -133,6 +152,8 @@ def _run_suite(suite: str, solver: str, node_type: str | None, timeout: float) -
                 "error": r.run_result.error,
                 "unexpected_message": r.run_result.test_case.unexpected_message,
                 "detail": _build_detail_message(r) if r.outcome != Outcome.PASS else None,
+                "stdout": r.run_result.stdout,
+                "stderr": r.run_result.stderr,
                 "onnx_path": str(r.run_result.test_case.onnx_path),
                 "vnnlib_path": str(r.run_result.test_case.vnnlib_path),
             }
@@ -156,11 +177,12 @@ def mvp(
     solver: str = typer.Option(..., "--solver", help="Command or path to invoke the solver's CLI (e.g. 'vibecheck' or './run_solver.sh')"),
     node_type: str | None = typer.Option(None, "--node-type", help="Run only this node type (e.g. add, relu, matmul)"),
     timeout: float = typer.Option(300.0, help="Per-test timeout in seconds"),
+    verbose: bool = typer.Option(False, "--verbose", help="Also print each test's full raw solver output, sat or unsat, like the original per-test dump"),
 ):
     """
     Run the MVP test suite against a solver, one test at a time.
     """
-    _run_suite("mvp", solver, node_type, timeout)
+    _run_suite("mvp", solver, node_type, timeout, verbose)
 
 
 @app.command()
@@ -168,11 +190,12 @@ def precision(
     solver: str = typer.Option(..., "--solver", help="Command or path to invoke the solver's CLI"),
     node_type: str | None = typer.Option(None, "--node-type", help="Run only this node type (e.g. add, relu, matmul)"),
     timeout: float = typer.Option(300.0, help="Per-test timeout in seconds"),
+    verbose: bool = typer.Option(False, "--verbose", help="Also print each test's full raw solver output, sat or unsat, like the original per-test dump"),
 ):
     """
     Run the precision test suite against a solver, one test at a time.
     """
-    _run_suite("precision", solver, node_type, timeout)
+    _run_suite("precision", solver, node_type, timeout, verbose)
 
 
 if __name__ == "__main__":
