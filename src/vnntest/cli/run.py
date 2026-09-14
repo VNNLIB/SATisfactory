@@ -87,9 +87,14 @@ def _validate_node_type(node_type: str | None) -> None:
 
 
 def _run_suite(
-    suite: str, solver: str, node_type: str | None, timeout: float, verbose: bool = False,
+    suite: str, solver: str, node_type: str | None, timeout: float, verbose: bool | None = None,
 ) -> None:
     _validate_node_type(node_type)
+    # No explicit --verbose/--no-verbose: default to on when drilling into a
+    # single node type (that's a small, deliberate run -- see the output),
+    # off for a full-suite run (that's already a lot of lines).
+    if verbose is None:
+        verbose = node_type is not None
 
     typer.echo("Generating test artifacts...")
     manifest = generate_all_tests(suite=suite, node_type=node_type)
@@ -177,7 +182,7 @@ def mvp(
     solver: str = typer.Option(..., "--solver", help="Command or path to invoke the solver's CLI (e.g. 'vibecheck' or './run_solver.sh')"),
     node_type: str | None = typer.Option(None, "--node-type", help="Run only this node type (e.g. add, relu, matmul)"),
     timeout: float = typer.Option(300.0, help="Per-test timeout in seconds"),
-    verbose: bool = typer.Option(False, "--verbose", help="Also print each test's full raw solver output, sat or unsat, like the original per-test dump"),
+    verbose: bool | None = typer.Option(None, "--verbose/--no-verbose", help="Print each test's full raw solver output, sat or unsat. Defaults to on with --node-type, off for a full run"),
 ):
     """
     Run the MVP test suite against a solver, one test at a time.
@@ -190,7 +195,7 @@ def precision(
     solver: str = typer.Option(..., "--solver", help="Command or path to invoke the solver's CLI"),
     node_type: str | None = typer.Option(None, "--node-type", help="Run only this node type (e.g. add, relu, matmul)"),
     timeout: float = typer.Option(300.0, help="Per-test timeout in seconds"),
-    verbose: bool = typer.Option(False, "--verbose", help="Also print each test's full raw solver output, sat or unsat, like the original per-test dump"),
+    verbose: bool | None = typer.Option(None, "--verbose/--no-verbose", help="Print each test's full raw solver output, sat or unsat. Defaults to on with --node-type, off for a full run"),
 ):
     """
     Run the precision test suite against a solver, one test at a time.
