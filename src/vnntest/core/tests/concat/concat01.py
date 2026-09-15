@@ -20,9 +20,9 @@ def build_vnnlib_spec():
     # maxes at 1.0) -> UNSAT.
     return """(vnnlib-version <2.0>)
 
-(declare-netwrok N
+(declare-network N
     (declare-input X float32 [2])
-    (declare-output Y float32[4])
+    (declare-output Y float32 [4])
 )
 
 ; Input Constraints
