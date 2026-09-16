@@ -31,3 +31,20 @@ To set up the project locally for development, follow these steps:
    vnntest --help
    solver-test-suite --help
    ```
+
+## Compliance checks (Story 7)
+
+```bash
+vnntest compliance opset --solver vibecheck
+vnntest compliance vnnlib --solver vibecheck
+vnntest compliance serialise-assignments --solver vibecheck
+```
+
+- `opset`: validates the reported minimum/maximum ONNX opset versions.
+- `vnnlib`: validates the reported minimum/maximum VNN-LIB versions.
+- `serialise-assignments`: validates that the reported capability is `true` or `false`; either is a valid response.
+
+Each command reports PASS or FAIL for the solver's reported CLI/interface
+format and behaviour. These checks do not prove that the solver actually
+supports or correctly implements the capabilities it reports. Full compliance
+coverage and integration with the report remain future work.
