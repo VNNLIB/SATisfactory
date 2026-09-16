@@ -1,13 +1,29 @@
-"""Extension contracts for test generators and node-type cases.
+"""Agreed extension contracts: NodeType, TestCase, TestGenerator.
 
-To add coverage, implement these interfaces in a plugin module. Do not
-edit this file, ``registry.py``, ``generator.py``, or ``runner.py``.
+Adding a node type or generator must use these interfaces. Do not edit
+this file, ``registry.py``, ``generator.py``, or ``runner.py`` to add
+coverage. See README.md (How to add a new node type).
 """
 
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from collections.abc import Iterable
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class NodeType:
+    """A neural-network operator the suite can test.
+
+    Register a node type by creating ``src/vnntest/core/tests/<name>/``
+    with case files. Do not edit core execution code. ``name`` must match
+    the folder name and ``TestCase.node_type``.
+    """
+
+    name: str
+    onnx_op: str = ""
+    description: str = ""
 
 
 class TestCase(ABC):
