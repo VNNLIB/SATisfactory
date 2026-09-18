@@ -10,7 +10,7 @@ def build_onnx_model():
 
     return transpose_x.to_model_proto()
 
-def bulid_vnnlib_spec():
+def build_vnnlib_spec():
     # X[0,0] is 0 to 1; 
     # X[0,1] is 10 to 11. 
     # Correct: Y[1,0]=X[0,1].
