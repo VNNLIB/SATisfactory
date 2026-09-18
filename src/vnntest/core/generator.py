@@ -1,47 +1,89 @@
-import importlib.util
+"""Build ONNX and VNNLIB artifacts for registered test cases."""
+
+from __future__ import annotations
+
+import json
 from pathlib import Path
+
 import onnx
 
-def discover_tests():
-    """Finds all test files in the core/tests directory."""
-    tests_dir = Path(__file__).parent / "tests"
-    return tests_dir.rglob("*.py")
+from vnntest.core.paths import ARTIFACTS_DIR, CACHE_DIR
+from vnntest.core.protocols import CaseSource
+from vnntest.core.registry import get_cases
 
-def build_test_artifacts(test_file: Path):
-    """Builds ONNX and VNNLIB artifacts for a single test file. Returns (onnx_path, vnnlib_path) or None."""
-    # Ensure the base cache directory and its .gitignore exist
-    base_cache_dir = Path(".vnntest")
-    base_cache_dir.mkdir(parents=True, exist_ok=True)
-    gitignore_path = base_cache_dir / ".gitignore"
+
+def _ensure_cache_dir() -> None:
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    gitignore_path = CACHE_DIR / ".gitignore"
     if not gitignore_path.exists():
         gitignore_path.write_text("*\n")
 
-    import sys
-    spec = importlib.util.spec_from_file_location(test_file.stem, test_file)
-    module = importlib.util.module_from_spec(spec)
-    sys.modules[spec.name] = module
-    spec.loader.exec_module(module)
-    
-    # Check if the file has our required build functions
-    if hasattr(module, "build_onnx_model") and hasattr(module, "build_vnnlib_spec"):
-        tests_dir = Path(__file__).parent / "tests"
-        subfolder = test_file.relative_to(tests_dir).parent
-        cache_dir = Path(".vnntest/tests") / subfolder
-        cache_dir.mkdir(parents=True, exist_ok=True)
-        
-        # Generate and Save ONNX
-        onnx_model = module.build_onnx_model()
-        onnx_path = cache_dir / f"{test_file.stem}.onnx"
-        onnx.save(onnx_model, str(onnx_path))
-        
-        # Generate and Save VNNLIB
-        vnnlib_lines = module.build_vnnlib_spec()
-        vnnlib_path = cache_dir / f"{test_file.stem}.vnnlib"
-        with open(vnnlib_path, "w") as f:
-            if isinstance(vnnlib_lines, str):
-                f.write(vnnlib_lines)
-            else:
-                f.writelines(line + "\n" for line in vnnlib_lines)
-            
-        return onnx_path, vnnlib_path
-    return None
+
+def _artifact_subdir(case: CaseSource) -> Path:
+    relative = getattr(case, "relative_dir", None)
+    return Path(relative) if relative else Path(case.node_type)
+
+
+def _vnnlib_text(spec: str | list[str]) -> str:
+    if isinstance(spec, str):
+        return spec if spec.endswith("\n") else spec + "\n"
+    return "".join(line + "\n" for line in spec)
+
+
+def build_test_artifacts(case: CaseSource) -> tuple[Path, Path]:
+    """Build ONNX and VNNLIB artifacts for a single case. Returns (onnx_path, vnnlib_path)."""
+    _ensure_cache_dir()
+    cache_dir = ARTIFACTS_DIR / _artifact_subdir(case)
+    cache_dir.mkdir(parents=True, exist_ok=True)
+
+    onnx_model = case.build_onnx_model()
+    onnx_path = cache_dir / f"{case.id}.onnx"
+    onnx.save(onnx_model, str(onnx_path))
+
+    vnnlib_path = cache_dir / f"{case.id}.vnnlib"
+    vnnlib_path.write_text(_vnnlib_text(case.build_vnnlib_spec()))
+
+    return onnx_path, vnnlib_path
+
+
+def _manifest_entry(case: CaseSource, onnx_path: Path, vnnlib_path: Path) -> dict:
+    onnx_model = onnx.load(str(onnx_path))
+    op_types = sorted({node.op_type for node in onnx_model.graph.node})
+
+    # The op type this test is actually about, e.g. "matmul" -> "MatMul".
+    # Other ops in the network (most commonly Constant, used to carry
+    # fixed values) are construction details, not what's under test -- a
+    # solver that folds Constant away without declaring it "supported"
+    # shouldn't cause every test that happens to use one to be skipped.
+    primary_op_type = next(
+        (op for op in op_types if op.lower() == case.node_type.lower()), None
+    )
+
+    return {
+        "name": case.id,
+        "category": case.node_type,
+        "onnx": onnx_path.name,
+        "vnnlib": vnnlib_path.name,
+        "expected": case.expected_output() or "UNKNOWN",
+        "op_types": op_types,
+        "primary_op_type": primary_op_type,
+        "description": case.description() or "",
+        "unexpected_message": case.unexpected_result_message(),
+    }
+
+
+def generate_all_tests(suite: str = "mvp", node_type: str | None = None) -> list[dict]:
+    """Builds artifacts for every registered case in ``suite`` (optionally
+    filtered to one node type), and writes manifest.json recording each
+    test's expected verdict and reporting metadata. Returns the entries."""
+    _ensure_cache_dir()
+    manifest_entries = []
+
+    for case in get_cases(suite=suite, node_type=node_type):
+        onnx_path, vnnlib_path = build_test_artifacts(case)
+        print(f"Generated {case.id} artifacts in {onnx_path.parent}")
+        manifest_entries.append(_manifest_entry(case, onnx_path, vnnlib_path))
+
+    manifest_path = CACHE_DIR / "manifest.json"
+    manifest_path.write_text(json.dumps(manifest_entries, indent=2))
+    return manifest_entries
