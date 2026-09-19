@@ -31,3 +31,35 @@ To set up the project locally for development, follow these steps:
    vnntest --help
    solver-test-suite --help
    ```
+
+## How to add a new node type
+
+Do **not** edit `src/vnntest/core/generator.py`, `registry.py`, `runner.py`, or `src/vnntest/cli/run.py`.
+
+Agreed interfaces (see `src/vnntest/core/protocols.py`):
+
+- `NodeType` — operator metadata. `name` is the folder name (`add`, `neg`).
+- `TestCase` — one ONNX model + VNNLIB query (`build_onnx_model`, `build_vnnlib_spec`).
+- `TestGenerator` — a plugin that yields `TestCase` objects.
+
+### Node type (handwritten cases)
+
+1. Create `src/vnntest/core/tests/<node>/`.
+2. Add `<node>01.py` (UNSAT) and `<node>02.py` (SAT) when that split applies.
+3. Each file must define `build_onnx_model()` and `build_vnnlib_spec()`. Optional: `return_expected_output()` and `unexpected_result_message()`.
+
+The handwritten generator picks the folder up on the next run:
+
+```bash
+vnntest run mvp --solver vibecheck --node-type neg
+```
+
+Worked example on this branch: `src/vnntest/core/tests/neg/` (`neg01.py`, `neg02.py`). No core execution files were changed for that add.
+
+### Test generator (new strategy)
+
+1. Create `src/vnntest/generators/<name>.py`.
+2. Subclass `TestGenerator`, implement `generate()`, set `name` and `suite`.
+3. Call `register_generator(YourGenerator())` at module import.
+
+More detail: `docs/modular_architecture.md`.

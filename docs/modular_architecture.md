@@ -7,7 +7,7 @@ How vnntest is extended. Source lives under `/src`, pytest files under `/tests`,
 ```
 src/vnntest/
   core/                 engine — do not edit to add coverage
-    protocols.py        TestCase / TestGenerator contracts
+    protocols.py        NodeType / TestCase / TestGenerator contracts
     registry.py         plugin discovery
     generator.py        writes ONNX + VNNLIB artifacts
     runner.py           invokes a solver

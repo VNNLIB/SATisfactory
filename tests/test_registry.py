@@ -1,6 +1,6 @@
 from vnntest.core.generator import build_test_artifacts, discover_tests
 from vnntest.core.paths import CASES_DIR
-from vnntest.core.protocols import TestCase, TestGenerator
+from vnntest.core.protocols import NodeType, TestCase, TestGenerator
 from vnntest.core.registry import (
     get_cases,
     get_generators,
@@ -16,6 +16,20 @@ def setup_function():
 
 def teardown_function():
     reset_registry()
+
+
+def test_node_type_contract_fields():
+    node = NodeType(name="neg", onnx_op="Neg", description="Unary negation")
+    assert node.name == "neg"
+    assert node.onnx_op == "Neg"
+
+
+def test_neg_node_type_is_discovered_without_core_changes():
+    """Evidence: Neg was added as files under core/tests/neg/ only."""
+    assert "neg" in get_node_types()
+    cases = get_cases(generator="handwritten", node_type="neg")
+    assert {case.id for case in cases} == {"neg01", "neg02"}
+    assert all(case.node_type == "neg" for case in cases)
 
 
 def test_handwritten_and_precision_generators_register():
