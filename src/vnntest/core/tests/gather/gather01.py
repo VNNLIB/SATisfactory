@@ -3,10 +3,10 @@
 from onnx import TensorProto
 from onnx import helper as onnx_helper
 from onnxscript import FLOAT, script
-from onnxscript.onnx_opset import opest18 as op
+from onnxscript.onnx_opset import opset18 as op
 
 def build_onnx_model():
-    @script
+    @script()
     def gather_x(x: FLOAT[4]) -> FLOAT[2]:
         indices= op.Constant(value=onnx_helper.make_tensor("indices", TensorProto.INT64, [2], [1, 3]))
         return op.Gather(x, indices, axis=0)
