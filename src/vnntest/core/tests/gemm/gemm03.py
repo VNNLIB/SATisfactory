@@ -11,8 +11,12 @@ from onnxscript.onnx_opset import opset18 as op
 def build_onnx_model():
     @script()
     def gemm_layer(x: FLOAT[1, 2]) -> FLOAT[1, 1]:
-        b = op.Constant(value=onnx_helper.make_tensor( "b", TensorProto.FLOAT, [2, 1], [1.0, 1.0]))
-        c = op.Constant(value=onnx_helper.make_tensor( "c", TensorProto.FLOAT, [1], [1.0] ))
+        b = op.Constant(value=onnx_helper.make_tensor(
+            "b", TensorProto.FLOAT, [2, 1], [1.0, 1.0]
+            ))
+        c = op.Constant(value=onnx_helper.make_tensor( 
+            "c", TensorProto.FLOAT, [1], [1.0] 
+            ))
         return op.Gemm(x, b, c, alpha=2.0, beta=0.5)
 
     return gemm_layer.to_model_proto()
