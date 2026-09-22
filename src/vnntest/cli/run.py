@@ -181,7 +181,7 @@ def _run_suite(
 def mvp(
     solver: str = typer.Option(..., "--solver", help="Command or path to invoke the solver's CLI (e.g. 'vibecheck' or './run_solver.sh')"),
     node_type: str | None = typer.Option(None, "--node-type", help="Run only this node type (e.g. add, relu, matmul)"),
-    timeout: float = typer.Option(300.0, help="Per-test timeout in seconds"),
+    timeout: float = typer.Option(5.0, help="Per-test timeout in seconds"),
     verbose: bool | None = typer.Option(None, "--verbose/--no-verbose", help="Print each test's full raw solver output, sat or unsat. Defaults to on with --node-type, off for a full run"),
 ):
     """
@@ -194,7 +194,7 @@ def mvp(
 def precision(
     solver: str = typer.Option(..., "--solver", help="Command or path to invoke the solver's CLI"),
     node_type: str | None = typer.Option(None, "--node-type", help="Run only this node type (e.g. add, relu, matmul)"),
-    timeout: float = typer.Option(300.0, help="Per-test timeout in seconds"),
+    timeout: float = typer.Option(5.0, help="Per-test timeout in seconds"),
     verbose: bool | None = typer.Option(None, "--verbose/--no-verbose", help="Print each test's full raw solver output, sat or unsat. Defaults to on with --node-type, off for a full run"),
 ):
     """
