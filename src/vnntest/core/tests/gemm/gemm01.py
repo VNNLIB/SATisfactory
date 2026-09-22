@@ -1,4 +1,7 @@
-"""Gemm node test case: unsat direction"""
+"""Gemm node test case: unsat direction, default attributes (alpha=1,
+beta=1, no transpose). Paired with gemm02.py so the suite covers both
+polarities for this node type. See gemm03/gemm04 for alpha/beta
+scaling, and gemm05/gemm06 for transB. """
 
 from onnx import TensorProto
 from onnx import helper as onnx_helper

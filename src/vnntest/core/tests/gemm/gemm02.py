@@ -1,5 +1,7 @@
-"""Gemm node test case: sat direction. Paired with gemm01.py so the suite
-covers both polarities for this node type."""
+"""Gemm node test case: sat direction, default attributes (alpha=1,
+beta=1, no transpose). Paired with gemm01.py so the suite covers both
+polarities for this node type. See gemm03/gemm04 for alpha/beta
+scaling, and gemm05/gemm06 for transB."""
 
 from onnx import TensorProto
 from onnx import helper as onnx_helper
