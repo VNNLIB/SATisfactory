@@ -1,5 +1,4 @@
-"""Relu node test case: sat direction. Paired with relu02.py to cover
-both polarities for the Relu node."""
+"""Expected SAT: Model computes Y = Relu(X). With X[0] in [-1000.0, 0.0], Y is 0.0, satisfying Y[0] <= 0.0. The solver failed to find this solution."""
 
 from onnxscript import FLOAT, script
 from onnxscript.onnx_opset import opset18 as op

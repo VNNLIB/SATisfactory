@@ -1,4 +1,4 @@
-"""Slice node test case: basic 1D slice, unsat direction."""
+"""Expected UNSAT: Model slices X[1:3] into Y. Y[0] corresponds to X[1], which is bounded by [2.0, 3.0]. The condition Y[0] >= 4.0 is therefore unreachable."""
 
 from onnx import TensorProto
 from onnx import helper as onnx_helper

@@ -1,3 +1,5 @@
+"""Expected UNSAT: Model computes Y = X + 0. With input X <= 0.0, the output condition Y >= 1.0 is impossible. The solver incorrectly claimed it is satisfiable."""
+
 import onnx
 from onnxscript import FLOAT
 from onnxscript import script

@@ -1,3 +1,5 @@
+"""Expected UNSAT: Model computes Y = X1 * 2.0. With inputs X1 >= 1.0, Y >= 2.0. Finding Y < 0.0 is unsatisfiable. The solver failed to prove this."""
+
 import onnx
 from pathlib import Path
 from onnxscript import FLOAT

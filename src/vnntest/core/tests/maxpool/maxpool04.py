@@ -1,4 +1,4 @@
-"""MaxPool node test case: strides (UNSAT)"""
+"""Expected UNSAT: With strides=[2, 2], the peak at X[0,0,1,1] only affects the top-left output Y[0,0,0,0]. The top-right output Y[0,0,0,1] must be 0.0, making >= 5.0 impossible."""
 
 from onnx import TensorProto
 from onnxscript import FLOAT, script

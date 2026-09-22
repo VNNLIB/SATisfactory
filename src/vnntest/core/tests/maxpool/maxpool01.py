@@ -1,4 +1,4 @@
-"""MaxPool node test case: multiple channels (SAT)"""
+"""Expected SAT: MaxPool operates per channel. If channel C elements are in [C, C+1], its output is in [C, C+1]."""
 
 from onnx import TensorProto
 from onnxscript import FLOAT, script

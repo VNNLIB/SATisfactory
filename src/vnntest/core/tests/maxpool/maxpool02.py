@@ -1,4 +1,4 @@
-"""MaxPool node test case: basic (UNSAT)"""
+"""Expected UNSAT: Max possible value in the 2x2 window is 3.0, so >= 4.0 is unsatisfiable."""
 
 from onnx import TensorProto
 from onnxscript import FLOAT, script

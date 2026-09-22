@@ -1,4 +1,4 @@
-"""Pow node test case: power of 0."""
+"""Expected SAT: Model computes Y[0] = X[0]^0 = 1.0. The output condition Y[0] ~ 1.0 is reachable. The solver incorrectly claimed it is unsatisfiable."""
 
 from onnx import TensorProto
 from onnx import helper as onnx_helper

@@ -1,3 +1,5 @@
+"""Expected UNSAT: Model computes Y = X + [1, -1]. With X[0] >= 0, Y[0] >= 1, making output condition Y[0] <= 0 impossible. The solver incorrectly claimed it is satisfiable."""
+
 import onnx
 from onnxscript import FLOAT
 from onnxscript import script

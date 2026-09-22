@@ -1,4 +1,4 @@
-"""Conv node test case: multiple input and output channels (UNSAT)"""
+"""Expected UNSAT: Convolution outputs the sum of 8 elements from the input (2 channels x 2x2 spatial). The max possible is 8.0. Y[0,0,0,0] >= 9.0 is impossible."""
 
 from onnx import TensorProto
 from onnx import helper as onnx_helper

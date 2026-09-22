@@ -1,4 +1,4 @@
-"""Slice node test case: negative axes and out-of-bounds indices, sat direction."""
+"""Expected SAT: Model slices axis -1 from -2 to 1000. For shape [2, 3], this extracts the last two elements of axis 1. Y[0,0] corresponds to X[0,1], bounded by [5.0, 6.0], making Y[0,0] >= 5.0 reachable."""
 
 from onnx import TensorProto
 from onnx import helper as onnx_helper

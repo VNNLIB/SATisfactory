@@ -1,4 +1,4 @@
-"""Sigmoid node test case: sat direction."""
+"""Expected SAT: Model computes Y = Sigmoid(X). With X in [0.0, 1.0], Y can be up to ~0.731, making the output condition Y[0] >= 0.7 possible. The solver incorrectly claimed it is unsatisfiable."""
 
 from onnxscript import FLOAT, script
 from onnxscript.onnx_opset import opset18 as op

@@ -1,4 +1,4 @@
-"""Pow node test case: sat direction."""
+"""Expected SAT: Model computes Y = X^2. With X in [0.0, 2.0], Y can be up to 4.0. The output condition Y[0] >= 3.0 is reachable (e.g., when X = 2.0). The solver incorrectly claimed it is unsatisfiable."""
 
 from onnx import TensorProto
 from onnx import helper as onnx_helper

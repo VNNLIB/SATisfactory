@@ -1,4 +1,4 @@
-"""Conv node test case: dilations (SAT)"""
+"""Expected SAT: With dilations=[2,2], the 2x2 kernel accesses corners of the 3x3 input (4 elements). Max is 4.0, so Y[0,0,0,0] >= 3.5 is satisfiable."""
 
 from onnx import TensorProto
 from onnx import helper as onnx_helper

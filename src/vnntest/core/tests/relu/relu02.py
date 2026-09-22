@@ -1,5 +1,4 @@
-"""Relu node test case: unsat direction. Paired with relu01.py to cover
-both polarities for the Relu node."""
+"""Expected UNSAT: Model computes Y = Relu(X). With X[0] in [1.0, 1000.0], Y is in [1.0, 1000.0], making the condition Y[0] <= 0.0 impossible. The solver incorrectly claimed it is satisfiable."""
 
 from onnxscript import FLOAT, script
 from onnxscript.onnx_opset import opset18 as op
