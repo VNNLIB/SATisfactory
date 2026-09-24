@@ -1,9 +1,9 @@
 """
 Run the code by using:
 
-    vnntest run mvp --solver vibecheck
-    vnntest run mvp --solver vibecheck --node-type matmul
-    vnntest run mvp --solver vibecheck --verbose
+    vnnlib-satisfactory run --solver vibecheck
+    vnnlib-satisfactory run --solver vibecheck --node-type matmul
+    vnnlib-satisfactory run --solver vibecheck --verbose
 """
 
 import json
@@ -22,8 +22,6 @@ from vnntest.core.generator import generate_all_tests
 from vnntest.core.registry import get_node_types
 from vnntest.core.runner import SolverRunResult, get_supported_ops, run_solver_on_test
 from vnntest.models.test_case import TestCase
-
-app = typer.Typer(help="Run solver test suites, one test at a time, with detailed output")
 
 _SYMBOL = {"pass": "✅", "fail": "❌", "suspect": "🚩", "error": "⚠️", "skip": "⏭️"}
 
@@ -103,7 +101,7 @@ def _run_suite(
                     + (f" and node type {node_type!r}." if node_type else "."))
         return
 
-    cache_dir = Path(".vnntest")
+    cache_dir = Path(".vnnlib-satisfactory")
     test_cases = [
         TestCase.from_manifest_entry(e, cache_dir / "tests" / e["category"])
         for e in manifest
@@ -177,31 +175,13 @@ def _run_suite(
     typer.echo(f"\nDetailed report written to {cache_dir / 'report.json'}")
 
 
-@app.command()
-def mvp(
+def run(
     solver: str = typer.Option(..., "--solver", help="Command or path to invoke the solver's CLI (e.g. 'vibecheck' or './run_solver.sh')"),
     node_type: str | None = typer.Option(None, "--node-type", help="Run only this node type (e.g. add, relu, matmul)"),
     timeout: float = typer.Option(300.0, help="Per-test timeout in seconds"),
     verbose: bool | None = typer.Option(None, "--verbose/--no-verbose", help="Print each test's full raw solver output, sat or unsat. Defaults to on with --node-type, off for a full run"),
 ):
     """
-    Run the MVP test suite against a solver, one test at a time.
+    Run the test suite against a solver, one test at a time.
     """
-    _run_suite("mvp", solver, node_type, timeout, verbose)
-
-
-@app.command()
-def precision(
-    solver: str = typer.Option(..., "--solver", help="Command or path to invoke the solver's CLI"),
-    node_type: str | None = typer.Option(None, "--node-type", help="Run only this node type (e.g. add, relu, matmul)"),
-    timeout: float = typer.Option(300.0, help="Per-test timeout in seconds"),
-    verbose: bool | None = typer.Option(None, "--verbose/--no-verbose", help="Print each test's full raw solver output, sat or unsat. Defaults to on with --node-type, off for a full run"),
-):
-    """
-    Run the precision test suite against a solver, one test at a time.
-    """
-    _run_suite("precision", solver, node_type, timeout, verbose)
-
-
-if __name__ == "__main__":
-    app()
+    _run_suite("full", solver, node_type, timeout, verbose)

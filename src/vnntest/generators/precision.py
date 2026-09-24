@@ -46,8 +46,9 @@ class PrecisionGenerator(TestGenerator):
     suite = "precision"
 
     def generate(self):
-        # Yield TestCase instances here. Leaving this empty keeps
-        # ``vnntest run precision`` valid while the suite is filled in.
+        # Yield TestCase instances here. Not currently wired into the CLI
+        # (only the "full" suite is exposed via ``run``) -- registered
+        # here so it's ready to plug back in if this suite gets revived.
         return ()
 
 

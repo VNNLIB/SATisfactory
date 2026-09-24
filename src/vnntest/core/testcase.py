@@ -13,7 +13,7 @@ from vnntest.core.protocols import CaseSource
 
 def load_case_module(path: Path) -> ModuleType:
     """Import a case file without putting it on the package search path."""
-    module_name = f"vnntest_case_{path.parent.name}_{path.stem}"
+    module_name = f"vnnlib_satisfactory_case_{path.parent.name}_{path.stem}"
     spec = importlib.util.spec_from_file_location(module_name, path)
     if spec is None or spec.loader is None:
         raise ImportError(f"Cannot load test case from {path}")
@@ -31,7 +31,7 @@ class ModuleCaseSource(CaseSource):
         path: Path,
         module: ModuleType,
         *,
-        suite: str = "mvp",
+        suite: str = "full",
         generator: str = "handwritten",
     ):
         self.source_path = path
@@ -46,7 +46,7 @@ class ModuleCaseSource(CaseSource):
         cls,
         path: Path,
         *,
-        suite: str = "mvp",
+        suite: str = "full",
         generator: str = "handwritten",
     ) -> ModuleCaseSource | None:
         """Load ``path`` if it exposes the required build functions."""
