@@ -1,4 +1,4 @@
-"""Slice node test case: multi-dimensional slice, sat direction."""
+"""Expected SAT: Model slices X[0:2, 1:3] into Y. Y[1,1] corresponds to X[1,2], which is bounded by [10.0, 11.0]. The condition Y[1,1] >= 10.0 is therefore easily reachable."""
 
 from onnx import TensorProto
 from onnx import helper as onnx_helper

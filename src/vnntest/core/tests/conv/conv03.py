@@ -1,4 +1,4 @@
-"""Conv node test case: auto_pad SAME_UPPER (SAT)"""
+"""Expected SAT: With SAME_UPPER padding on a 3x3 input and 3x3 kernel, Y[0,0,0,0] will sum 4 elements from the top-left corner of the input. Since input is in [0,1], max is 4.0, so >= 3.0 is satisfiable."""
 
 from onnx import TensorProto
 from onnx import helper as onnx_helper

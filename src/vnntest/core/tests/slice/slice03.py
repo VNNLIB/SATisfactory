@@ -1,4 +1,4 @@
-"""Slice node test case: slice with steps, unsat direction."""
+"""Expected UNSAT: Model slices X[0:5:2] into Y. Y[1] corresponds to X[2], which is strictly positive [1.0, 2.0]. The output constraint Y[1] <= 0.0 is unreachable."""
 
 from onnx import TensorProto
 from onnx import helper as onnx_helper

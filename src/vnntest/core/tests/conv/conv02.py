@@ -1,4 +1,4 @@
-"""Conv node test case: strides (UNSAT)"""
+"""Expected UNSAT: Convolution outputs the sum of 4 elements (max 4.0) since there is no bias. Condition Y[0,0,0,0] >= 5.0 is impossible."""
 
 from onnx import TensorProto
 from onnx import helper as onnx_helper

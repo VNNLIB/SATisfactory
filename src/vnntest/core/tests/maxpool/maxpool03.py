@@ -1,4 +1,4 @@
-"""MaxPool node test case: ceil_mode (SAT)"""
+"""Expected SAT: With ceil_mode=1, the 3x3 input results in a 2x2 output. The bottom-right element of the input (at 2,2) will be captured by the bottom-right pooling window, so Y[0,0,1,1] should match X[0,0,2,2]."""
 
 from onnx import TensorProto
 from onnxscript import FLOAT, script
