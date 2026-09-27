@@ -1,3 +1,5 @@
+"""Expected SAT: Model computes Y = X + 0. With input X >= 1.0, finding Y <= 1.0 is satisfiable (at X=1.0). The solver failed to find this solution."""
+
 import onnx
 from pathlib import Path
 from onnxscript import FLOAT

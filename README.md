@@ -45,7 +45,7 @@ Useful options for `run`:
 |---|---|
 | `--solver` (required) | Command or path to invoke the solver's CLI |
 | `--node-type` | Run only one node type, e.g. `--node-type matmul` |
-| `--timeout` | Per-test timeout in seconds (default `300.0`) |
+| `--timeout` | Per-test timeout in seconds (default `5.0`) |
 | `--verbose` / `--no-verbose` | Print each test's full raw solver stdout/stderr. Defaults to on when `--node-type` is set, off for a full-suite run |
 
 Example targeting a single node type with verbose output:

@@ -1,41 +1,39 @@
-import onnx
-from pathlib import Path
-from onnxscript import FLOAT
-from onnxscript import script
+"""Expected UNSAT: Model computes Y = Relu(X). With X[0] in [1.0, 1000.0], Y is in [1.0, 1000.0], making the condition Y[0] <= 0.0 impossible. The solver incorrectly claimed it is satisfiable."""
+
+from onnxscript import FLOAT, script
 from onnxscript.onnx_opset import opset18 as op
 
+
 def build_onnx_model():
-    # Define your custom graph layer using Python syntax
     @script()
     def relu_layer(x: FLOAT[1]) -> FLOAT[1]:
-        # Using intuitive Python operators translates directly to ONNX ops
         return op.Relu(x)
 
-    # Convert the script function into an ONNX model object
-    onnx_model = relu_layer.to_model_proto()
-    return onnx_model
+    return relu_layer.to_model_proto()
+
 
 def build_vnnlib_spec():
-    lines = []
+    # X[0] is in [1.0, 1000.0]. Y = Relu(X), so Y[0] will be in [1.0, 1000.0].
+    # Output constraint requires Y[0] <= 0.0, which is impossible.
+    # Therefore, UNSAT.
+    return """(vnnlib-version <2.0>)
 
-    # VNN-LIB 2.0 declaration
-    lines.append("(vnnlib-version <2.0>)")
-    lines.append("")
+(declare-network N
+    (declare-input X float32 [1])
+    (declare-output Y float32 [1])
+)
 
-    # neural network declaration
-    lines.append("(declare-network N")
-    lines.append("    (declare-input X real [1])") 
-    lines.append("    (declare-output Y real [1])")
-    lines.append(")")
-    lines.append("")
+; Input Constraints
+(assert (<= X[0] 1000.0))
+(assert (>= X[0] 1.0))
 
-    # Input constraints
-    lines.append("; Input Constraints")
-    lines.append("(assert (and (<= X[0] 1000.0) (>= X[0] 1.0)))")
-    lines.append("")
+; Output Constraints
+(assert (<= Y[0] 0.0))"""
 
-    # output constraints
-    lines.append("; Output Constraints")
-    lines.append("(assert (<= Y[0] 0.0))")
-    
-    return lines
+
+def return_expected_output():
+    return "UNSAT"
+
+
+def unexpected_result_message():
+    return "Expected UNSAT: Model computes Y = Relu(X). With X[0] in [1.0, 1000.0], Y is in [1.0, 1000.0], making the condition Y[0] <= 0.0 impossible. The solver incorrectly claimed it is satisfiable."

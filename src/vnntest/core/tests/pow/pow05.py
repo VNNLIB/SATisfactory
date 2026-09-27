@@ -1,4 +1,4 @@
-"""Pow node test case: negative fractional indices."""
+"""Expected SAT: Model computes Y[0] = X[0]^(-0.5). With X[0] in [1.0, 4.0], Y[0] can be 0.5 (when X[0] = 4.0). The output condition Y[0] <= 0.6 is reachable. The solver incorrectly claimed it is unsatisfiable."""
 
 from onnx import TensorProto
 from onnx import helper as onnx_helper

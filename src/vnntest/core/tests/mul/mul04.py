@@ -1,3 +1,5 @@
+"""Expected UNSAT: Model computes Y = X1 * [1.0, 2.0] with tensor broadcasting. X1 elements are in [1.0, 2.0], so Y elements should be in [1.0, 4.0]. Finding any element of Y outside this range is unsatisfiable. The solver failed to prove this."""
+
 import onnx
 from pathlib import Path
 from onnxscript import FLOAT

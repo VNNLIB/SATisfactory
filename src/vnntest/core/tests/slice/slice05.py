@@ -1,4 +1,4 @@
-"""Slice node test case: negative steps, unsat direction."""
+"""Expected UNSAT: Model slices X backwards from 4 to 0 (exclusive) with step -2. Y[0] = X[4] and Y[1] = X[2]. X[2] is bounded by [5.0, 6.0], so Y[1] <= 4.0 is unreachable."""
 
 from onnx import TensorProto
 from onnx import helper as onnx_helper
