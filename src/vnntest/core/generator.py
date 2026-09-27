@@ -72,7 +72,7 @@ def _manifest_entry(case: CaseSource, onnx_path: Path, vnnlib_path: Path) -> dic
     }
 
 
-def generate_all_tests(suite: str = "mvp", node_type: str | None = None) -> list[dict]:
+def generate_all_tests(suite: str = "full", node_type: str | None = None) -> list[dict]:
     """Builds artifacts for every registered case in ``suite`` (optionally
     filtered to one node type), and writes manifest.json recording each
     test's expected verdict and reporting metadata. Returns the entries."""

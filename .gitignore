@@ -1,6 +1,6 @@
 .venv/
 .venv-*/
 .venv_*/
-vnntest.egg-info/
+vnnlib_satisfactory.egg-info/
 1_Scope_of_Work.md
 __pycache__/
