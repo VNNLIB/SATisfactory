@@ -61,11 +61,15 @@ def _build_detail_message(result: EvaluationResult) -> str:
     return ""  # PASS never reaches this -- callers only invoke it on non-pass
 
 
-def _print_raw_output(run_result: SolverRunResult) -> None:
-    """Dumps a test's full solver stdout/stderr, unabridged -- the same
-    everything-it-said-for-every-test behaviour main's cli/run.py has
-    always had, offered here as an opt-in alongside the terse/detailed
-    modes rather than replacing them."""
+def _print_verbose_detail(run_result: SolverRunResult) -> None:
+    """Shown for every test when --verbose is on, not just failures: the
+    query that was run, the solver's full raw stdout/stderr, and the
+    expected vs. actual verdict."""
+    tc = run_result.test_case
+    if tc.vnnlib_path and Path(tc.vnnlib_path).exists():
+        typer.echo("    --- query ---")
+        for line in Path(tc.vnnlib_path).read_text().strip().splitlines():
+            typer.echo(f"    {line}")
     typer.echo("    --- raw solver output ---")
     for line in run_result.stdout.splitlines():
         typer.echo(f"    {line}")
@@ -73,6 +77,7 @@ def _print_raw_output(run_result: SolverRunResult) -> None:
         typer.echo("    --- stderr ---")
         for line in run_result.stderr.splitlines():
             typer.echo(f"    {line}")
+    typer.echo(f"    expected={tc.expected.value}  actual={run_result.verdict.value}")
 
 
 def _validate_node_type(node_type: str | None) -> None:
@@ -128,7 +133,7 @@ def _run_suite(
         if eval_result.outcome != Outcome.PASS:
             typer.echo(f"    {_build_detail_message(eval_result)}")
         if verbose:
-            _print_raw_output(run_result)
+            _print_verbose_detail(run_result)
 
     for s in skipped:
         typer.echo(f"{_SYMBOL['skip']} {s.test_id:<24} (missing: {s.missing_op})")
