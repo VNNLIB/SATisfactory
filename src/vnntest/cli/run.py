@@ -30,17 +30,25 @@ def _build_detail_message(result: EvaluationResult) -> str:
     tc = result.run_result.test_case
     description = tc.description or "(no description provided)"
 
+    def _with_unexpected(base: str) -> str:
+        """Appends the test's own unexpected_result_message(), when it
+        defines one, on top of the outcome-specific explanation -- the
+        whole point of that field is to explain what this specific test
+        was checking, so every non-pass outcome should surface it, not
+        just FAIL."""
+        return f"{base} {tc.unexpected_message}" if tc.unexpected_message else base
+
     # ERROR: solver crashed/timed out, or there's no known verdict to compare against.
     if result.outcome == Outcome.ERROR:
         if result.run_result.timed_out:
-            return f"{description} -> solver timed out."
+            return _with_unexpected(f"{description} -> solver timed out.")
         if result.run_result.error:
-            return f"{description} -> solver error: {result.run_result.error}"
-        return f"{description} -> no known expected verdict for this test; nothing to compare against."
+            return _with_unexpected(f"{description} -> solver error: {result.run_result.error}")
+        return _with_unexpected(f"{description} -> no known expected verdict for this test; nothing to compare against.")
 
     # SUSPECT: solver claims support, ran cleanly, still returned "unknown".
     if result.outcome == Outcome.SUSPECT:
-        return (
+        return _with_unexpected(
             f"{description} -> solver claims to support this op and ran "
             f"without crashing or timing out, but returned 'unknown' instead "
             f"of a definite verdict (expected '{result.expected.value}')."
