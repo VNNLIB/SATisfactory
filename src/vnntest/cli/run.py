@@ -2,7 +2,7 @@
 Run the code by using:
 
     vnnlib-satisfactory run --solver vibecheck
-    vnnlib-satisfactory run --solver vibecheck --node-type matmul
+    vnnlib-satisfactory run --solver vibecheck --test matmul
     vnnlib-satisfactory run --solver vibecheck --verbose
 """
 
@@ -80,30 +80,30 @@ def _print_raw_output(run_result: SolverRunResult) -> None:
             typer.echo(f"    {line}")
 
 
-def _validate_node_type(node_type: str | None) -> None:
-    if node_type is None:
+def _validate_test(test: str | None) -> None:
+    if test is None:
         return
     known = get_node_types()
-    if node_type not in known:
-        typer.echo(f"Unknown node type {node_type!r}. Known: {', '.join(known)}")
+    if test not in known:
+        typer.echo(f"Unknown test category {test!r}. Known: {', '.join(known)}")
         raise typer.Exit(code=1)
 
 
 def _run_suite(
-    suite: str, solver: str, node_type: str | None, timeout: float, verbose: bool | None = None,
+    suite: str, solver: str, test: str | None, timeout: float, verbose: bool | None = None,
 ) -> None:
-    _validate_node_type(node_type)
+    _validate_test(test)
     # No explicit --verbose/--no-verbose: default to on when drilling into a
-    # single node type (that's a small, deliberate run -- see the output),
+    # single test category (that's a small, deliberate run -- see the output),
     # off for a full-suite run (that's already a lot of lines).
     if verbose is None:
-        verbose = node_type is not None
+        verbose = test is not None
 
     typer.echo("Generating test artifacts...")
-    manifest = generate_all_tests(suite=suite, node_type=node_type)
+    manifest = generate_all_tests(suite=suite, node_type=test)
     if not manifest:
         typer.echo(f"No test cases registered for suite {suite!r}"
-                    + (f" and node type {node_type!r}." if node_type else "."))
+                    + (f" and test category {test!r}." if test else "."))
         return
 
     cache_dir = Path(".vnnlib-satisfactory")
@@ -183,11 +183,11 @@ def _run_suite(
 
 def run(
     solver: str = typer.Option(..., "--solver", help="Command or path to invoke the solver's CLI (e.g. 'vibecheck' or './run_solver.sh')"),
-    node_type: str | None = typer.Option(None, "--node-type", help="Run only this node type (e.g. add, relu, matmul)"),
+    test: str | None = typer.Option(None, "--test", help="Run only this test category (e.g. add, relu, network_multiple)"),
     timeout: float = typer.Option(5.0, help="Per-test timeout in seconds"),
-    verbose: bool | None = typer.Option(None, "--verbose/--no-verbose", help="Print each test's full raw solver output, sat or unsat. Defaults to on with --node-type, off for a full run"),
+    verbose: bool | None = typer.Option(None, "--verbose/--no-verbose", help="Print each test's full raw solver output, sat or unsat. Defaults to on with --test, off for a full run"),
 ):
     """
     Run the test suite against a solver, one test at a time.
     """
-    _run_suite("full", solver, node_type, timeout, verbose)
+    _run_suite("full", solver, test, timeout, verbose)
