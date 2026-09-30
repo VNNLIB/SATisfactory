@@ -20,7 +20,8 @@ def build_vnnlib_spec():
     (declare-output Y float32 [1])
 )
 
-(declare-network N2 equal-to N1
+(declare-network N2
+    (equal-to N1)
     (declare-input X2 float32 [1])
     (declare-output Y2 float32 [1])
 )

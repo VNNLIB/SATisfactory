@@ -20,7 +20,12 @@ from vnntest.core.evaluator import (
 )
 from vnntest.core.generator import generate_all_tests
 from vnntest.core.registry import get_node_types
-from vnntest.core.runner import SolverRunResult, get_supported_ops, run_solver_on_test
+from vnntest.core.runner import (
+    SolverRunResult,
+    get_supported_ops,
+    get_supported_network_theories,
+    run_solver_on_test,
+)
 from vnntest.models.test_case import TestCase
 
 _SYMBOL = {"pass": "✅", "fail": "❌", "suspect": "🚩", "error": "⚠️", "skip": "⏭️"}
@@ -109,9 +114,10 @@ def _run_suite(
 
     typer.echo(f"\nChecking what {solver} claims to support...")
     supported_ops = get_supported_ops(solver)
-    if supported_ops is None:
+    supported_network_theories = get_supported_network_theories(solver)
+    if supported_ops is None and supported_network_theories is None:
         typer.echo("  (solver does not implement `supports`; running every test)")
-    runnable, skipped = partition_by_support(test_cases, supported_ops)
+    runnable, skipped = partition_by_support(test_cases, supported_ops, supported_network_theories)
     if skipped:
         typer.echo(f"  Skipping {len(skipped)} test(s) for unsupported op types.")
 
