@@ -14,7 +14,7 @@ from vnntest.core.testcase import ModuleCaseSource
 
 class HandwrittenGenerator(TestGenerator):
     name = "handwritten"
-    suite = "mvp"
+    suite = "full"
 
     def generate(self):
         if not CASES_DIR.is_dir():

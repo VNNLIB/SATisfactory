@@ -1,6 +1,6 @@
 # Modular architecture
 
-How vnntest is extended. Source lives under `/src`, pytest files under `/tests`, and design notes (this file) under `/docs`, as described in `Contributing.md`.
+How VNN-LIB SATisfactory is extended. Source lives under `/src`, pytest files under `/tests`, and design notes (this file) under `/docs`, as described in `Contributing.md`.
 
 ## Layout
 
@@ -41,7 +41,7 @@ Existing polarity pairs use `01` for the UNSAT direction and `02` for the SAT di
 The handwritten generator discovers the new folder on the next run:
 
 ```bash
-vnntest run mvp --solver vibecheck --node-type add
+vnnlib-satisfactory run --solver vibecheck --node-type add
 ```
 
 ## Add a test generator (no core rewrite)

@@ -18,13 +18,13 @@ class CaseSource(ABC):
     Required attributes (set on the subclass or instance):
         id: unique name within the node type, e.g. ``"add01"``.
         node_type: folder-style name, e.g. ``"add"`` or ``"matmul"``.
-        suite: which CLI suite this case belongs to, e.g. ``"mvp"``.
+        suite: which CLI suite this case belongs to, e.g. ``"full"``.
         generator: the plugin that produced this case.
     """
 
     id: str
     node_type: str
-    suite: str = "mvp"
+    suite: str = "full"
     generator: str = "custom"
 
     @abstractmethod
@@ -57,7 +57,7 @@ class TestGenerator(ABC):
     """
 
     name: str
-    suite: str = "mvp"
+    suite: str = "full"
 
     @abstractmethod
     def generate(self) -> Iterable[CaseSource]:

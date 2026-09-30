@@ -22,7 +22,7 @@ def test_handwritten_and_precision_generators_register():
     gens = get_generators()
     assert "handwritten" in gens
     assert "precision" in gens
-    assert gens["handwritten"].suite == "mvp"
+    assert gens["handwritten"].suite == "full"
     assert gens["precision"].suite == "precision"
 
 
@@ -44,22 +44,22 @@ def test_handwritten_cases_include_existing_add_files():
     ids = {case.id for case in cases}
     assert ids == {"add01", "add02"}
     assert all(case.node_type == "add" for case in cases)
-    assert all(case.suite == "mvp" for case in cases)
+    assert all(case.suite == "full" for case in cases)
 
 
-def test_suite_filter_separates_mvp_from_precision():
-    mvp_cases = get_cases(suite="mvp")
+def test_suite_filter_separates_full_from_precision():
+    full_cases = get_cases(suite="full")
     precision_cases = get_cases(suite="precision")
-    assert len(mvp_cases) > 0
+    assert len(full_cases) > 0
     assert precision_cases == []
-    assert all(case.suite == "mvp" for case in mvp_cases)
+    assert all(case.suite == "full" for case in full_cases)
 
 
 def test_new_generator_is_visible_without_core_changes():
     class DummyCase(CaseSource):
         id = "dummy01"
         node_type = "dummy"
-        suite = "mvp"
+        suite = "full"
         generator = "dummy"
 
         def build_onnx_model(self):
@@ -70,7 +70,7 @@ def test_new_generator_is_visible_without_core_changes():
 
     class DummyGenerator(TestGenerator):
         name = "dummy"
-        suite = "mvp"
+        suite = "full"
 
         def generate(self):
             yield DummyCase()
