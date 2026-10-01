@@ -78,6 +78,7 @@ def test_shared_runner_preserves_process_output():
 def test_verify_invocation_and_output_are_unchanged():
     test_case = TestCase(
         name='query', category='model', onnx_path=Path('model.onnx'),
+        onnx_paths={'N': Path('model.onnx')},
         vnnlib_path=Path('query.vnnlib'), expected=Verdict.UNSAT,
     )
     result = subprocess.CompletedProcess([], 0, 'unsat\n', 'log\n')
