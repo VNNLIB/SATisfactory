@@ -27,6 +27,7 @@ class TestCase:
     name: str            # e.g. "add01"
     category: str        # e.g. "add" (subfolder under core/tests)
     onnx_path: Path
+    onnx_paths: dict[str, Path]
     vnnlib_path: Path
     expected: Verdict
     op_types: list[str] = field(default_factory=list)  # ONNX op types in the model, e.g. ["Add"]
@@ -40,10 +41,16 @@ class TestCase:
 
     @classmethod
     def from_manifest_entry(cls, entry: dict, cache_dir: Path) -> "TestCase":
+        if "networks" in entry:
+            onnx_paths = {k: cache_dir / v for k, v in entry["networks"].items()}
+        else:
+            onnx_paths = {"N": cache_dir / entry["onnx"]}
+
         return cls(
             name=entry["name"],
             category=entry["category"],
             onnx_path=cache_dir / entry["onnx"],
+            onnx_paths=onnx_paths,
             vnnlib_path=cache_dir / entry["vnnlib"],
             expected=Verdict.from_str(entry["expected"]),
             op_types=entry.get("op_types", []),

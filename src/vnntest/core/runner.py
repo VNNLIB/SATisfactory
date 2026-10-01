@@ -72,6 +72,23 @@ def get_supported_ops(exec_path: str) -> Optional[set[str]]:
     return ops or None
 
 
+def get_supported_network_theories(exec_path: str) -> Optional[set[str]]:
+    """
+    Returns the set of network theories the solver claims to support, via its
+    `supports --multiple-network-theories` command (VNN-LIB 2.0 Chapter 5).
+    """
+    try:
+        result = run_solver_command(exec_path, ["supports", "--multiple-network-theories"], timeout=30)
+    except (subprocess.TimeoutExpired, FileNotFoundError):
+        return None
+
+    if result.returncode != 0:
+        return None
+
+    theories = {line.strip() for line in result.stdout.splitlines() if line.strip()}
+    return theories or None
+
+
 def run_solver_on_test(exec_path: str, test_case: TestCase, timeout: int = 300) -> SolverRunResult:
     """
     Executes a VNNLIB 2.0 compatible solver on a single test case.
@@ -85,9 +102,13 @@ def run_solver_on_test(exec_path: str, test_case: TestCase, timeout: int = 300) 
     cmd = [
         "verify",
         str(test_case.vnnlib_path),
-        "--network", f"N={test_case.onnx_path}",
-        "--timeout", str(timeout),
     ]
+    if hasattr(test_case, "onnx_paths") and test_case.onnx_paths:
+        for name, path in test_case.onnx_paths.items():
+            cmd.extend(["--network", f"{name}={path}"])
+    else:
+        cmd.extend(["--network", f"N={test_case.onnx_path}"])
+    cmd.extend(["--timeout", str(timeout)])
 
     try:
         result = run_solver_command(exec_path, cmd, timeout)

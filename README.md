@@ -46,7 +46,7 @@ Useful options for `run`:
 | `--solver` (required) | Command or path to invoke the solver's CLI |
 | `--node-type` | Run only one node type, e.g. `--node-type matmul` |
 | `--timeout` | Per-test timeout in seconds (default `5.0`) |
-| `--verbose` / `--no-verbose` | Print each test's full raw solver stdout/stderr. Defaults to on when `--node-type` is set, off for a full-suite run |
+| `--verbose` / `--no-verbose` | For every test, print the VNN-LIB query that was run, the solver's full raw stdout/stderr, and the expected vs. actual verdict -- not just for failures. Defaults to on when `--node-type` is set, off for a full-suite run. Behaves identically regardless of how it's triggered (explicit flag or the node-type default) |
 
 Example targeting a single node type with verbose output:
 
