@@ -74,6 +74,7 @@ def partition_by_support(
     test_cases: list[TestCase],
     supported_ops: Optional[set[str]],
     supported_network_theories: Optional[set[str]] = None,
+    supported_hidden_node_theories: Optional[set[str]] = None,
 ) -> tuple[list[TestCase], list[SkippedResult]]:
     """
     Splits test cases into those the solver claims to support and those it
@@ -89,7 +90,7 @@ def partition_by_support(
     unavailable) or a test has no determinable primary_op_type, that test
     is not skipped -- we have no solid basis to filter it out.
     """
-    if supported_ops is None and supported_network_theories is None:
+    if supported_ops is None and supported_network_theories is None and supported_hidden_node_theories is None:
         return test_cases, []
 
     runnable: list[TestCase] = []
@@ -105,6 +106,11 @@ def partition_by_support(
             req = theory_map.get(tc.category)
             if req and supported_network_theories is not None and req not in supported_network_theories:
                 skipped.append(SkippedResult(tc, req))
+            else:
+                runnable.append(tc)
+        elif tc.category == "hidden":
+            if supported_hidden_node_theories is not None and "H" not in supported_hidden_node_theories:
+                skipped.append(SkippedResult(tc, "H theory"))
             else:
                 runnable.append(tc)
         elif tc.primary_op_type and supported_ops is not None and tc.primary_op_type not in supported_ops:

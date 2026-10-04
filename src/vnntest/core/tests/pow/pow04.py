@@ -9,7 +9,7 @@ from onnxscript.onnx_opset import opset18 as op
 def build_onnx_model():
     @script()
     def pow_model(x: FLOAT[1]) -> FLOAT[1]:
-        c = op.Constant(value=onnx_helper.make_tensor("c", TensorProto.FLOAT, [1], [0.0]))
+        c = op.Constant(value=onnx_helper.make_tensor("c", TensorProto.FLOAT, [], [0.0]))
         return op.Pow(x, c)
 
     return pow_model.to_model_proto()
