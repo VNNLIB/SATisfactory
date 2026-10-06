@@ -145,7 +145,7 @@ def _run_suite(
         eval_results.append(eval_result)
 
         symbol = _SYMBOL[eval_result.outcome.value]
-        typer.echo(f"Test {i} {symbol} {eval_result.test_id}")
+        typer.echo(f"Test {i} {symbol}  {eval_result.test_id}")
         if eval_result.outcome != Outcome.PASS:
             typer.echo(f"    {_build_detail_message(eval_result)}")
         if verbose:
