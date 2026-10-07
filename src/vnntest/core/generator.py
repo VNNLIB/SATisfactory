@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 import onnx
@@ -59,10 +60,22 @@ def _manifest_entry(case: CaseSource, onnx_path: Path, vnnlib_path: Path) -> dic
         (op for op in op_types if op.lower() == case.node_type.lower()), None
     )
 
+    vnnlib_text = vnnlib_path.read_text()
+    pattern = r"\(declare-network\s+([A-Za-z_][A-Za-z0-9_]*)(?:\s*\((equal-to|isomorphic-to)\s+([A-Za-z_][A-Za-z0-9_]*)\))?"
+    networks = []
+    for match in re.finditer(pattern, vnnlib_text):
+        name, relation_type, relation_target = match.groups()
+        if relation_type != "equal-to":
+            networks.append(name)
+    if not networks:
+        networks = ["N"]
+    networks_dict = {name: onnx_path.name for name in networks}
+
     return {
         "name": case.id,
         "category": case.node_type,
         "onnx": onnx_path.name,
+        "networks": networks_dict,
         "vnnlib": vnnlib_path.name,
         "expected": case.expected_output() or "UNKNOWN",
         "op_types": op_types,
@@ -72,7 +85,7 @@ def _manifest_entry(case: CaseSource, onnx_path: Path, vnnlib_path: Path) -> dic
     }
 
 
-def generate_all_tests(suite: str = "mvp", node_type: str | None = None) -> list[dict]:
+def generate_all_tests(suite: str = "full", node_type: str | None = None) -> list[dict]:
     """Builds artifacts for every registered case in ``suite`` (optionally
     filtered to one node type), and writes manifest.json recording each
     test's expected verdict and reporting metadata. Returns the entries."""

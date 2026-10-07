@@ -1,6 +1,6 @@
 # Modular architecture
 
-How vnntest is extended. Source lives under `/src`, pytest files under `/tests`, and design notes (this file) under `/docs`, as described in `Contributing.md`.
+How VNN-LIB SATisfactory is extended. Source lives under `/src`, pytest files under `/tests`, and design notes (this file) under `/docs`, as described in `Contributing.md`.
 
 ## Layout
 
@@ -23,7 +23,8 @@ docs/                   design notes and client communications
 | What | Pattern | Example |
 |---|---|---|
 | Node-type folder | lowercase ONNX op name | `src/vnntest/core/tests/add/` |
-| Case file | `<node><nn>.py` (2-digit index) | `add01.py`, `add02.py` |
+| Feature folder | `network_*` for VNNLIB 2.0 features | `src/vnntest/core/tests/network_multiple/` |
+| Case file | `<node><nn>.py` (2-digit index) | `add01.py`, `network_multiple01.py` |
 | Generator module | snake_case, matches `name` | `src/vnntest/generators/precision.py` |
 | Generator class | `<Name>Generator` | `PrecisionGenerator` |
 
@@ -34,15 +35,17 @@ Existing polarity pairs use `01` for the UNSAT direction and `02` for the SAT di
 1. Create `src/vnntest/core/tests/<node>/`.
 2. Add `<node>01.py` (and `<node>02.py` if you need both SAT and UNSAT).
 3. Each file must define:
-   - `build_onnx_model()` → ONNX ModelProto
+   - `build_onnx_model()` → ONNX ModelProto (or dict if multiple ONNX are needed, though typically one is mapped to all required networks)
    - `build_vnnlib_spec()` → `str` or `list[str]`
    - optional `return_expected_output()` and `unexpected_result_message()`
 
 The handwritten generator discovers the new folder on the next run:
 
 ```bash
-vnntest run mvp --solver vibecheck --node-type add
+vnnlib-satisfactory run --solver vibecheck --node-type add
 ```
+
+Note: If testing VNN-LIB 2.0 specific features (like multiple networks), name the folder `network_single`, `network_multiple`, `network_equal`, or `network_isomorphic`. The runner will automatically check support for these via `supports --multiple-network-theories` rather than ONNX operators.
 
 ## Add a test generator (no core rewrite)
 

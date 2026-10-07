@@ -1,4 +1,4 @@
-"""MaxPool node test case: pads (SAT)"""
+"""Expected SAT: With padding, the pooled outputs will still come from the input elements, meaning they should remain in the bounds [2.0, 3.0]."""
 
 from onnx import TensorProto
 from onnxscript import FLOAT, script

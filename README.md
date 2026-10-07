@@ -1,6 +1,6 @@
-# CITS3200---Team-28: Generic Solver Testing Tool (vnntest)
+# VNN-LIB SATisfactory
 
-An automated, mathematically grounded testing suite for VNNLIB 2.0 neural network solvers.
+An automated, mathematically grounded testing suite for VNN-LIB 2.0 neural network solvers.
 
 Dependency versions are pinned in 'pyproject.toml' to keep installs reproducible.
 
@@ -26,10 +26,9 @@ To set up the project locally for development, follow these steps:
    ```
 
 4. **Verify the installation**:
-   You should now have access to the `vnntest` CLI, callable as either `vnntest` or `solver-test-suite`:
+   You should now have access to the CLI, callable as `vnnlib-satisfactory`:
    ```bash
-   vnntest --help
-   solver-test-suite --help
+   vnnlib-satisfactory --help
    ```
 
 ## Basic usage
@@ -37,35 +36,35 @@ To set up the project locally for development, follow these steps:
 Run a test suite against a solver:
 
 ```bash
-vnntest run mvp --solver vibecheck
+vnnlib-satisfactory run --solver vibecheck
 ```
 
-Useful options for `run mvp` / `run precision`:
+Useful options for `run`:
 
 | Flag | Purpose |
 |---|---|
 | `--solver` (required) | Command or path to invoke the solver's CLI |
 | `--node-type` | Run only one node type, e.g. `--node-type matmul` |
-| `--timeout` | Per-test timeout in seconds (default `300.0`) |
-| `--verbose` / `--no-verbose` | Print each test's full raw solver stdout/stderr. Defaults to on when `--node-type` is set, off for a full-suite run |
+| `--timeout` | Per-test timeout in seconds (default `5.0`) |
+| `--verbose` / `--no-verbose` | For every test, print the VNN-LIB query that was run, the solver's full raw stdout/stderr, and the expected vs. actual verdict -- not just for failures. Defaults to on when `--node-type` is set, off for a full-suite run. Behaves identically regardless of how it's triggered (explicit flag or the node-type default) |
 
 Example targeting a single node type with verbose output:
 
 ```bash
-vnntest run mvp --solver vibecheck --node-type matmul --verbose
+vnnlib-satisfactory run --solver vibecheck --node-type matmul --verbose
 ```
 
 Each run:
 
-1. Generates ONNX + VNNLIB artifacts for every registered test case and records them in `.vnntest/manifest.json`.
+1. Generates ONNX + VNNLIB artifacts for every registered test case and records them in `.vnnlib-satisfactory/manifest.json`.
 2. Queries the solver (via `supports --onnx-operators`) to find out which ops it claims to support, and skips tests for unsupported ops rather than running them.
 3. Runs the remaining tests one at a time, printing a pass/fail/suspect/error/skip symbol for each.
-4. Writes a detailed report to `.vnntest/report.json`.
+4. Writes a detailed report to `.vnnlib-satisfactory/report.json`.
 
 ## Viewing reports
 
 ```bash
-vnntest report view
+vnnlib-satisfactory report view
 ```
 
 Options:
@@ -73,7 +72,7 @@ Options:
 | Flag | Purpose |
 |---|---|
 | `--format` | `text` (default) or `json` |
-| `--report-path` | Path to the report file (default `.vnntest/report.json`) |
+| `--report-path` | Path to the report file (default `.vnnlib-satisfactory/report.json`) |
 | `--category` | Repeatable. Filter to `arithmetic`, `activation`, `structural`, or `other` |
 | `--outcome` | Repeatable. Filter to `pass`, `fail`, `suspect`, `error`, or `skip` |
 
@@ -81,10 +80,10 @@ Examples:
 
 ```bash
 # Only failures and suspect results
-vnntest report view --outcome fail --outcome suspect
+vnnlib-satisfactory report view --outcome fail --outcome suspect
 
 # Only arithmetic-category results, as JSON
-vnntest report view --category arithmetic --format json
+vnnlib-satisfactory report view --category arithmetic --format json
 ```
 
 Categories group node types by failure mode: **arithmetic** (real computation — wrong numbers indicate a real bug), **activation** (elementwise nonlinear functions, prone to boundary/strictness bugs), **structural** (value-preserving reshapes/no-ops, prone to elision or support bugs), and **other** for anything unlisted.
@@ -94,9 +93,9 @@ The exit code always reflects the *full, unfiltered* run — a display filter ne
 ## Compliance checks (Story 7)
 
 ```bash
-vnntest compliance opset --solver vibecheck
-vnntest compliance vnnlib --solver vibecheck
-vnntest compliance serialise-assignments --solver vibecheck
+vnnlib-satisfactory compliance opset --solver vibecheck
+vnnlib-satisfactory compliance vnnlib --solver vibecheck
+vnnlib-satisfactory compliance serialise-assignments --solver vibecheck
 ```
 
 - `opset`: validates the reported minimum/maximum ONNX opset versions.
@@ -110,7 +109,7 @@ coverage and integration with the report remain future work.
 
 ## Adding new tests
 
-vnntest's core (`core/protocols.py`, `core/registry.py`, `core/generator.py`, `core/runner.py`) is not meant to be edited when adding coverage. Two extension points cover everything:
+The tool's core (`core/protocols.py`, `core/registry.py`, `core/generator.py`, `core/runner.py`) is not meant to be edited when adding coverage. Two extension points cover everything:
 
 - **New node type** — drop a handwritten case folder under `src/vnntest/core/tests/<node>/`; the handwritten generator picks it up automatically on the next run.
 - **New test generator** — add a module under `src/vnntest/generators/` that subclasses `TestGenerator` and calls `register_generator()` at import time.

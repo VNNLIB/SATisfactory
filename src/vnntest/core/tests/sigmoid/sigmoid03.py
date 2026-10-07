@@ -1,4 +1,4 @@
-"""Sigmoid node test case: bounds unsat direction."""
+"""Expected UNSAT: Model computes Y = Sigmoid(X). The output of Sigmoid is always strictly between 0 and 1, regardless of the input. Therefore, it is impossible for the output Y[0] to be <= -0.01 or >= 1.01. The solver incorrectly claimed it is satisfiable."""
 
 from onnxscript import FLOAT, script
 from onnxscript.onnx_opset import opset18 as op

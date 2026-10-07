@@ -1,4 +1,4 @@
-"""Conv node test case: 1D convolution (UNSAT)"""
+"""Expected UNSAT: 1D convolution over 3 elements maxes out at 3.0. Y[0,0,0] >= 4.0 is impossible."""
 
 from onnx import TensorProto
 from onnx import helper as onnx_helper

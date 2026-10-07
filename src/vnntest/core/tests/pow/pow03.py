@@ -1,4 +1,4 @@
-"""Pow node test case: unsat direction with constant base."""
+"""Expected UNSAT: Model computes Y = 2^X. With X in [0.0, 2.0], Y is at most 4.0, making the output condition Y[0] >= 5.0 impossible. The solver incorrectly claimed it is satisfiable."""
 
 from onnx import TensorProto
 from onnx import helper as onnx_helper
@@ -9,7 +9,7 @@ from onnxscript.onnx_opset import opset18 as op
 def build_onnx_model():
     @script()
     def pow_model(x: FLOAT[1]) -> FLOAT[1]:
-        base = op.Constant(value=onnx_helper.make_tensor("base", TensorProto.FLOAT, [1], [2.0]))
+        base = op.Constant(value=onnx_helper.make_tensor("base", TensorProto.FLOAT, [], [2.0]))
         return op.Pow(base, x)
 
     return pow_model.to_model_proto()

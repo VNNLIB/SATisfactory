@@ -1,4 +1,4 @@
-"""MaxPool node test case: dilations (UNSAT)"""
+"""Expected UNSAT: With dilations=[2, 2], the center element is ignored. Output must be 0.0, so Y >= 5.0 is impossible."""
 
 from onnx import TensorProto
 from onnxscript import FLOAT, script

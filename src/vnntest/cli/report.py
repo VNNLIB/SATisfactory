@@ -24,7 +24,7 @@ _CATEGORY_OF = {
     "constant": "structural",
 }
 _CATEGORY_ORDER = ["arithmetic", "activation", "structural", "other"]
-_SYMBOL = {"pass": "✅", "fail": "❌", "suspect": "🚩", "error": "⚠️", "skip": "⏭️"}
+_SYMBOL = {"pass": "✅", "fail": "❌", "suspect": "🟠", "error": "⚠️", "skip": "⏭️"}
 _DETAIL_OUTCOMES = {"fail", "suspect", "error"}
 
 
@@ -51,7 +51,7 @@ def report_callback():
 @app.command()
 def view(
     format: str = typer.Option("text", help="Report output format (text, json)"),
-    report_path: str = typer.Option(".vnntest/report.json", help="Path to the report file"),
+    report_path: str = typer.Option(".vnnlib-satisfactory/report.json", help="Path to the report file"),
     category: List[Category] = typer.Option(
         [], "--category", help="Only show these categories (repeatable), e.g. --category arithmetic"
     ),
@@ -64,7 +64,7 @@ def view(
     """
     path = Path(report_path)
     if not path.exists():
-        typer.echo(f"No report found at {path}. Run `vnntest run mvp --solver <solver>` first.")
+        typer.echo(f"No report found at {path}. Run `vnnlib-satisfactory run --solver <solver>` first.")
         raise typer.Exit(code=1)
 
     report = json.loads(path.read_text())

@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "vnntest"
+name = "vnnlib-satisfactory"
 version = "0.0.1"
 authors = [
   { name="Lukas Rohwer", email="24215157@student.uwa.edu.au" },
@@ -13,7 +13,7 @@ authors = [
   { name="Randall Heng", email="24271194@student.uwa.edu.au" },
   { name="Danny Nguyen", email="24256619@student.uwa.edu.au" },
 ]
-description = "An automated, mathematically grounded testing suite for VNNLIB 2.0 neural network solvers."
+description = "VNN-LIB SATisfactory -- an automated, mathematically grounded testing suite for VNN-LIB 2.0 neural network solvers."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
@@ -34,5 +34,4 @@ Homepage = "https://github.com/randollz/CITS3200---Team-28"
 Issues = "https://github.com/randollz/CITS3200---Team-28/issues"
 
 [project.scripts]
-vnntest = "vnntest.cli.main:app"
-solver-test-suite = "vnntest.cli.main:app"
+vnnlib-satisfactory = "vnntest.cli.main:app"

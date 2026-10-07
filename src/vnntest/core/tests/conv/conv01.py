@@ -1,4 +1,4 @@
-"""Conv node test case: pads, bias (SAT)"""
+"""Expected SAT: With all inputs in [0, 1], the center pixel of the padded convolution involves summing all 9 elements plus 0.5 bias. Max possible is 9.5, so >= 9.0 is satisfiable."""
 
 from onnx import TensorProto
 from onnx import helper as onnx_helper
