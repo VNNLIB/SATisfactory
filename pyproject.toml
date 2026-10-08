@@ -35,3 +35,5 @@ Issues = "https://github.com/randollz/CITS3200---Team-28/issues"
 
 [project.scripts]
 vnnlib-satisfactory = "vnntest.cli.main:app"
+[tool.hatch.build.targets.wheel]
+packages = ["src/vnntest"]
