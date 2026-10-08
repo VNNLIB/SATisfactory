@@ -24,7 +24,7 @@ _CATEGORY_OF = {
     "constant": "structural",
 }
 _CATEGORY_ORDER = ["arithmetic", "activation", "structural", "other"]
-_SYMBOL = {"pass": "✅", "fail": "❌", "suspect": "🚩", "error": "⚠️", "skip": "⏭️"}
+_SYMBOL = {"pass": "✅", "fail": "❌", "suspect": "🟠", "error": "⚠️", "skip": "⏭️"}
 _DETAIL_OUTCOMES = {"fail", "suspect", "error"}
 
 
