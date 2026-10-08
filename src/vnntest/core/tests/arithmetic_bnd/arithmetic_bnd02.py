@@ -1,8 +1,6 @@
 """Arithmetic Complexity theory test: BND level, sat direction. Paired
-with arithmetic_bnd01.py -- same Add-with-baked-bias network, same
-single-variable-vs-constant assertion shape, the polarity flipped. The
-threshold here (Y[0] >= 0.5) is the exact worked example the standard
-itself gives for BND in Section 4.1.5."""
+with arithmetic_bnd01.py so the suite covers both polarities at this
+complexity level."""
 
 from onnx import TensorProto
 from onnx import helper as onnx_helper

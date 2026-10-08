@@ -1,16 +1,8 @@
 """Arithmetic Complexity theory test: BND level, unsat direction. BND is
-the base theory (VNN-LIB 2.0 Section 4.1.5): assertions may only relate
-a single variable to a constant, e.g. (assert (>= Y[0] 0.5)) -- no
-combining variables, no comparing two variables to each other. This is
-a query-language classification, not a network one, so the network here
-is kept as simple as possible -- the same Add-with-baked-bias shape as
-add01/add02, deliberately NOT an elided op like Identity/Reshape (those
-crash vibecheck's graph builder entirely when they're the network's only
-node, which would contaminate this test with a different, already-
-documented bug rather than isolating the assertion's complexity). Every
-existing node-type test in this suite already happens to be BND-level;
-this file exists to label and verify that explicitly, using literally
-the standard's own worked example threshold (Y[0] >= 0.5, see bnd02)."""
+the simplest level of query complexity in the VNN-LIB 2.0 standard: every
+assertion compares a single variable to a constant, never combining or
+comparing variables to each other. Checks that a solver claiming BND
+support handles this baseline case correctly."""
 
 from onnx import TensorProto
 from onnx import helper as onnx_helper
