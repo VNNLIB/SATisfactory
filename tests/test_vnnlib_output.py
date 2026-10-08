@@ -1,22 +1,14 @@
-import sys
-import subprocess
 import glob
 import vnnlib
+from vnntest.core.generator import generate_all_tests
 
 def test_vnnlib_structure():
     """
     Runs the full test suite to generate artifacts and then uses vnnlib
     to verify the structure of all generated .vnnlib files.
     """
-    # Run the CLI to generate the full-suite artifacts.
-    # We use capture_output=True so it doesn't spam the test output.
-    # Note: e.exe might not exist, so this command might return a non-zero exit code
-    # when it tries to run the solver, but the artifacts should still be generated first.
-    subprocess.run(
-        [sys.executable, "-m", "vnntest", "run", "--solver", "vibecheck"],
-        capture_output=True,
-        text=True
-    )
+    # Generate the full-suite artifacts directly.
+    generate_all_tests(suite="full")
 
     # Find all generated .vnnlib files
     # Artifacts are generated in the .vnnlib-satisfactory/tests directory
