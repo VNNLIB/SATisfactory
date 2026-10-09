@@ -105,6 +105,26 @@ def get_supported_hidden_node_theories(exec_path: str) -> Optional[set[str]]:
     theories = {line.strip() for line in result.stdout.splitlines() if line.strip()}
     return theories or None
 
+def get_supported_io_theories(exec_path: str) -> Optional[set[str]]:
+    """
+    Returns the set of input/output theories the solver claims to support, via its
+    `supports --multiple-input-output-theories` command (VNN-LIB 2.0 Chapter 5).
+
+    Some solvers add a note after the theory name on the same line,
+    e.g. "SIO * multi-input models run only through ...". We only keep
+    the first word (e.g. "SIO"), since that's the actual theory name.
+    """
+    try:
+        result = run_solver_command(exec_path, ["supports", "--multiple-input-output-theories"], timeout=30)
+    except (subprocess.TimeoutExpired, FileNotFoundError):
+        return None
+
+    if result.returncode != 0:
+        return None
+
+    theories = {line.strip().split()[0] for line in result.stdout.splitlines() if line.strip()}
+    return theories or None
+
 def run_solver_on_test(exec_path: str, test_case: TestCase, timeout: int = 300) -> SolverRunResult:
     """
     Executes a VNNLIB 2.0 compatible solver on a single test case.
