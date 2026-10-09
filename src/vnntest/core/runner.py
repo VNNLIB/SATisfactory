@@ -105,6 +105,7 @@ def get_supported_hidden_node_theories(exec_path: str) -> Optional[set[str]]:
     theories = {line.strip() for line in result.stdout.splitlines() if line.strip()}
     return theories or None
 
+
 def get_supported_io_theories(exec_path: str) -> Optional[set[str]]:
     """
     Returns the set of input/output theories the solver claims to support, via its
@@ -124,6 +125,7 @@ def get_supported_io_theories(exec_path: str) -> Optional[set[str]]:
 
     theories = {line.strip().split()[0] for line in result.stdout.splitlines() if line.strip()}
     return theories or None
+
 
 def run_solver_on_test(exec_path: str, test_case: TestCase, timeout: int = 300) -> SolverRunResult:
     """
