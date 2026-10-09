@@ -30,7 +30,7 @@ from vnntest.core.runner import (
 )
 from vnntest.models.test_case import TestCase
 
-_SYMBOL = {"pass": "✅", "fail": "❌", "suspect": "🚩", "error": "⚠️", "skip": "⏭️"}
+_SYMBOL = {"pass": "✅", "fail": "❌", "suspect": "🟠", "error": "⚠️", "skip": "⏭️"}
 
 
 def _build_detail_message(result: EvaluationResult) -> str:
