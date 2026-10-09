@@ -11,18 +11,19 @@ def build_onnx_model():
     @script()
     def constant_of_input_shape(x: FLOAT[2, 3]) -> FLOAT[2, 3]:
         shape = op.Shape(x)
-        return op.ConstantOfShape(
+        fives = op.ConstantOfShape(
             shape, value=onnx_helper.make_tensor("value", TensorProto.FLOAT, [1], [5.0])
         )
+        return op.Add(x, fives)
 
     return constant_of_input_shape.to_model_proto()
 
 
 def build_vnnlib_spec():
-    # Same model as constantofshape05. Every Y entry is exactly 5.0, so
-    # 4.5 <= Y[1,2] <= 5.5 holds for every legal X (witness: any X) -> SAT.
-    # A solver that used the default fill 0.0, or could not resolve the
-    # shape coming from Shape(X), would wrongly say UNSAT.
+    # Same model as constantofshape05. Y[1,2] = X[1,2] + 5.0 is 5 to 15, so
+    # Y[1,2] >= 14.5 is reachable (witness X[1,2]=10.0 -> Y[1,2]=15.0) ->
+    # SAT. A solver that used the default fill 0.0 would cap Y[1,2] at 10.0
+    # and wrongly say UNSAT.
     return """(vnnlib-version <2.0>)
 
 (declare-network N
@@ -45,8 +46,8 @@ def build_vnnlib_spec():
 (assert (<= X[1,2] 10.0))
 
 ; Output Constraints
-(assert (>= Y[1,2] 4.5))
-(assert (<= Y[1,2] 5.5))"""
+(assert (>= Y[1,2] 14.5))
+(assert (<= Y[1,2] 100.0))"""
 
 
 def return_expected_output():
@@ -54,4 +55,4 @@ def return_expected_output():
 
 
 def unexpected_result_message():
-    return "Expected SAT: Model computes Y = ConstantOfShape(Shape(X), value=5.0), a 2x3 tensor that is exactly 5.0 everywhere, so 4.5 <= Y[1,2] <= 5.5 holds for every X (witness: any X). The solver failed to find this solution, likely because it used the default fill 0.0 or could not resolve the shape coming from Shape(X)."
+    return "Expected SAT: Model computes Y = X + ConstantOfShape(Shape(X), value=5.0), so every Y entry is X + 5.0. With X[1,2] in [0.0, 10.0], finding Y[1,2] >= 14.5 is satisfiable (at X[1,2]=10.0, Y[1,2]=15.0). The solver failed to find this solution, likely because it could not resolve the shape coming from Shape(X) or used the default fill 0.0."
