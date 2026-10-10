@@ -15,7 +15,7 @@ def build_vnnlib_spec():
     # X1 in [0.0, 1.0], X2 in [10.0, 11.0]. Y = X1 - X2, so Y is in [-11.0, -9.0].
     # Y <= -10.5 is reachable, e.g. witness X1 = 0.0, X2 = 11.0 gives Y = -11.0 -> SAT.
     # If the inputs were swapped, Y would be in [9.0, 11.0] and the solver would say UNSAT.
-    return """(vnnlib-version <2.0)
+    return """(vnnlib-version <2.0>)
 
 (declare-network N
     (declare-input X1 float32 [1])
