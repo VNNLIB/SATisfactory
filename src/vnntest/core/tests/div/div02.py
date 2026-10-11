@@ -3,8 +3,7 @@ against the true maximum. Paired with div01.py. Unlike div01 (which is
 trivially outside the true range regardless of precision), this one
 requires the solver to actually find the tightest correct bound -- a
 loose over-approximation here reports UNSAT when the true answer is
-SAT, the same way our earlier Pow and BatchNormalization tests caught
-vibecheck being confidently wrong rather than honestly unsure."""
+SAT."""
 
 from onnxscript import FLOAT, script
 from onnxscript.onnx_opset import opset18 as op
