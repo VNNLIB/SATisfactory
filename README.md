@@ -44,14 +44,14 @@ Useful options for `run`:
 | Flag | Purpose |
 |---|---|
 | `--solver` (required) | Command or path to invoke the solver's CLI |
-| `--node-type` | Run only one node type, e.g. `--node-type matmul` |
+| `--test` | Run only one test category, e.g. `--test matmul` |
 | `--timeout` | Per-test timeout in seconds (default `5.0`) |
-| `--verbose` / `--no-verbose` | For every test, print the VNN-LIB query that was run, the solver's full raw stdout/stderr, and the expected vs. actual verdict -- not just for failures. Defaults to on when `--node-type` is set, off for a full-suite run. Behaves identically regardless of how it's triggered (explicit flag or the node-type default) |
+| `--verbose` / `--no-verbose` | For every test, print the VNN-LIB query that was run, the solver's full raw stdout/stderr, and the expected vs. actual verdict -- not just for failures. Defaults to on when `--test` is set, off for a full-suite run. Behaves identically regardless of how it's triggered (explicit flag or the test-category default) |
 
-Example targeting a single node type with verbose output:
+Example targeting a single test category with verbose output:
 
 ```bash
-vnnlib-satisfactory run --solver vibecheck --node-type matmul --verbose
+vnnlib-satisfactory run --solver vibecheck --test matmul --verbose
 ```
 
 Each run:

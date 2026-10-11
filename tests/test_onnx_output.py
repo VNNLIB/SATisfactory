@@ -1,19 +1,14 @@
-import sys
-import subprocess
 import glob
 import onnx
+from vnntest.core.generator import generate_all_tests
 
 def test_onnx_structure():
     """
     Runs the full test suite to generate artifacts and then uses the onnx
     package to verify the structure of all generated .onnx files.
     """
-    # Run the CLI to generate the full-suite artifacts.
-    subprocess.run(
-        [sys.executable, "-m", "vnntest", "run", "--solver", "vibecheck"],
-        capture_output=True,
-        text=True
-    )
+    # Generate the full-suite artifacts directly.
+    generate_all_tests(suite="full")
 
     # Find all generated .onnx files
     onnx_files = glob.glob(".vnnlib-satisfactory/tests/**/*.onnx", recursive=True)

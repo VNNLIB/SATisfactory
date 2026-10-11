@@ -2,9 +2,7 @@
 against the true maximum. Paired with div03.py. This is the sharpest
 test in the Div suite: it needs both correct sign handling (dividing by
 a negative range flips which corner of the input box produces the
-largest output) and a tight bound right at the true boundary -- the
-same combination that found real bugs in our Pow and BatchNormalization
-tests, now applied to the one hazard specific to division."""
+largest output) and a tight bound right at the true boundary."""
 
 from onnxscript import FLOAT, script
 from onnxscript.onnx_opset import opset18 as op
