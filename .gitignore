@@ -4,4 +4,5 @@
 vnnlib_satisfactory.egg-info/
 1_Scope_of_Work.md
 __pycache__/
+dist/
 .DS_Store
