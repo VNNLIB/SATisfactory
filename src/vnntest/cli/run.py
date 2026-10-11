@@ -25,6 +25,7 @@ from vnntest.core.runner import (
     get_supported_ops,
     get_supported_network_theories,
     get_supported_hidden_node_theories,
+    get_supported_io_theories,
     get_supported_arithmetic_complexity_theories,
     run_solver_on_test,
 )
@@ -131,11 +132,13 @@ def _run_suite(
     supported_ops = get_supported_ops(solver)
     supported_network_theories = get_supported_network_theories(solver)
     supported_hidden_node_theories = get_supported_hidden_node_theories(solver)
+    supported_io_theories = get_supported_io_theories(solver)
     supported_arithmetic_complexity_theories = get_supported_arithmetic_complexity_theories(solver)
     if (
         supported_ops is None
         and supported_network_theories is None
         and supported_hidden_node_theories is None
+        and supported_io_theories is None
         and supported_arithmetic_complexity_theories is None
     ):
         typer.echo("  (solver does not implement `supports`; running every test)")
@@ -144,13 +147,12 @@ def _run_suite(
         supported_ops,
         supported_network_theories,
         supported_hidden_node_theories,
-        supported_arithmetic_complexity_theories,
+        supported_io_theories=supported_io_theories,
+        supported_arithmetic_complexity_theories=supported_arithmetic_complexity_theories,
     )
     if skipped:
         typer.echo(f"  Skipping {len(skipped)} test(s) for unsupported op types.")
-
     typer.echo(f"\nRunning {len(runnable)} test(s) one by one using solver at {solver}...\n")
-
     eval_results: list[EvaluationResult] = []
     for i, tc in enumerate(runnable, start=1):
         run_result = run_solver_on_test(solver, tc, timeout=timeout)
