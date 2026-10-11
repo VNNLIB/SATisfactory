@@ -27,6 +27,19 @@ _CATEGORY_ORDER = ["arithmetic", "activation", "structural", "other"]
 _SYMBOL = {"pass": "✅", "fail": "❌", "suspect": "🟠", "error": "⚠️", "skip": "⏭️"}
 _DETAIL_OUTCOMES = {"fail", "suspect", "error"}
 
+# Arithmetic Complexity theory ladder (VNN-LIB 2.0 Chapter 4.1.5) -- a second,
+# independent grouping axis from _CATEGORY_OF above. _CATEGORY_OF groups by
+# what kind of bug a node type risks; this groups by which query-complexity
+# level a test demonstrates. A test can only appear here if its category is
+# one of these four.
+_THEORY_OF = {
+    "arithmetic_bnd": "BND",
+    "arithmetic_outc": "OUTC",
+    "arithmetic_lin": "LIN",
+    "arithmetic_poly": "POLY",
+}
+_THEORY_ORDER = ["BND", "OUTC", "LIN", "POLY"]
+
 
 class Category(str, Enum):
     ARITHMETIC = "arithmetic"
@@ -134,6 +147,7 @@ def _print_text_report(report: dict, categories: set, outcomes: set) -> None:
         typer.echo("No tests match the given filters.")
         return
 
+    _print_theory_section(report)
     _print_filtered_summary(report["results"], report.get("skipped", []))
 
 
@@ -163,6 +177,44 @@ def _print_failure_detail(r: dict) -> None:
         typer.echo("    query:")
         for line in Path(vnnlib_path).read_text().strip().splitlines():
             typer.echo(f"      {line}")
+
+
+def _print_theory_section(report: dict) -> None:
+    """Groups the same results by Arithmetic Complexity theory (BND/OUTC/LIN/
+    POLY), alongside the node-type grouping above. A test with no matching
+    theory (i.e. not an arithmetic_* category) is simply absent from here."""
+    grouped = defaultdict(list)
+    for r in report["results"]:
+        theory = _THEORY_OF.get(r["category"])
+        if theory:
+            grouped[theory].append(r)
+
+    skipped_grouped = defaultdict(list)
+    for s in report.get("skipped", []):
+        theory = _THEORY_OF.get(s["category"])
+        if theory:
+            skipped_grouped[theory].append(s)
+
+    if not grouped and not skipped_grouped:
+        return
+
+    header = "Arithmetic Complexity Theory"
+    typer.echo(f"\n{header}")
+    typer.echo("=" * len(header))
+    for theory in _THEORY_ORDER:
+        rows = grouped.get(theory, [])
+        skips = skipped_grouped.get(theory, [])
+        if not rows and not skips:
+            continue
+        typer.echo(f"\n{theory}")
+        typer.echo("-" * len(theory))
+        for r in rows:
+            symbol = _SYMBOL.get(r["outcome"], "?")
+            typer.echo(f"{symbol} {r['test_id']:<24} expected={r['expected']:<8} actual={r['actual']:<8}")
+            if r["outcome"] in _DETAIL_OUTCOMES:
+                _print_failure_detail(r)
+        for s in skips:
+            typer.echo(f"{_SYMBOL['skip']} {s['test_id']:<24} (missing: {s['missing_op']})")
 
 
 def _print_skipped_section(skipped: list) -> None:
