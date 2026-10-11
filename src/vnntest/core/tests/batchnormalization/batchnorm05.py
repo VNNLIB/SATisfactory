@@ -3,9 +3,9 @@ sat direction. Unlike batchnorm01/02 (same parameters, different assertion
 threshold) or batchnorm03/04 (same parameters, different output index),
 this pair holds bias/mean/var/X-range/assertion IDENTICAL to batchnorm06.py
 and varies ONLY scale. A solver that silently ignores or defaults `scale`
-(the exact value behind vibecheck's KeyError: 'scale' crash) would compute
-the same output for both files and so can be right for at most one of the
-two -- it cannot pass both by coincidence, unlike the existing pairs."""
+would compute the same output for both files and so can be right for at
+most one of the two -- it cannot pass both by coincidence, unlike the
+existing pairs."""
 
 from onnx import TensorProto
 from onnx import helper as onnx_helper
