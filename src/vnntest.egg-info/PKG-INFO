@@ -1,0 +1,47 @@
+Metadata-Version: 2.4
+Name: vnntest
+Version: 0.0.1
+Summary: An automated, mathematically grounded testing suite for VNNLIB 2.0 neural network solvers.
+Author-email: Lukas Rohwer <24215157@student.uwa.edu.au>, Bella Lu <24491136@student.uwa.edu.au>, Kylie Verzosa <24268374@student.uwa.edu.au>, Rundong Wu <24441894@student.uwa.edu.au>, Randall Heng <24271194@student.uwa.edu.au>, Danny Nguyen <24256619@student.uwa.edu.au>
+License-Expression: MIT
+Project-URL: Homepage, https://github.com/randollz/CITS3200---Team-28
+Project-URL: Issues, https://github.com/randollz/CITS3200---Team-28/issues
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: typer>=0.12.0
+Requires-Dist: onnxruntime
+Requires-Dist: onnx
+Requires-Dist: onnxscript
+
+# CITS3200---Team-28: Generic Solver Testing Tool (vnntest)
+
+An automated, mathematically grounded testing suite for VNNLIB 2.0 neural network solvers.
+
+## Local Setup
+
+To set up the project locally for development, follow these steps:
+
+1. **Create and activate a virtual environment**:
+   ```bash
+   python3 -m venv .venv
+   source .venv/bin/activate
+   ```
+
+2. **Upgrade pip**:
+   Ensure you have the latest version of `pip` so that editable installs work correctly.
+   ```bash
+   pip install --upgrade pip
+   ```
+
+3. **Install the project in editable mode**:
+   ```bash
+   pip install -e .
+   ```
+
+4. **Verify the installation**:
+   You should now have access to the `vnntest` CLI command.
+   ```bash
+   vnntest --help
+   ```
