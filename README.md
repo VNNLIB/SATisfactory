@@ -2,7 +2,12 @@
 
 An automated, mathematically grounded testing suite for VNN-LIB 2.0 neural network solvers.
 
-Dependency versions are pinned in 'pyproject.toml' to keep installs reproducible.
+Dependency version ranges are declared in `pyproject.toml`.
+
+## Installation
+
+See the [installation guide](docs/installation.md) for PyPI installation,
+solver setup, and your first test on Windows, macOS, or Linux.
 
 ## Local Setup
 
