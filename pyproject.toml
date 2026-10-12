@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "vnnlib-satisfactory"
-version = "0.0.2"
+version = "1.0.1"
 authors = [
   { name="Lukas Rohwer", email="24215157@student.uwa.edu.au" },
   { name="Bella Lu", email="24491136@student.uwa.edu.au" },
